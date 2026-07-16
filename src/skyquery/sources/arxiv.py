@@ -11,7 +11,7 @@ from typing import Any, ClassVar
 from skyquery.models.paper import Paper
 from skyquery.sources.base import DataSource
 
-_ARXIV_API = "http://export.arxiv.org/api/query"
+_ARXIV_API = "https://export.arxiv.org/api/query"
 
 
 class ArxivSource(DataSource):

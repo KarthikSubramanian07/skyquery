@@ -63,17 +63,23 @@ class AdsSource(DataSource):
     def _live_fetch(self, operation: str, params: dict[str, Any]) -> Any:
         import httpx
 
+        from skyquery.errors import TransientSourceError
+
         token = require_credential("ads")  # raises a clean CredentialError if missing
-        response = httpx.get(
-            _ADS_API,
-            params={
-                "q": params["q"],
-                "rows": params["rows"],
-                "fl": _FIELDS,
-                "sort": "date desc",
-            },
-            headers={"Authorization": f"Bearer {token}"},
-            timeout=30.0,
-        )
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = httpx.get(
+                _ADS_API,
+                params={
+                    "q": params["q"],
+                    "rows": params["rows"],
+                    "fl": _FIELDS,
+                    "sort": "date desc",
+                },
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=30.0,
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPError:
+            # Scrub: request headers carry the Bearer token; never chain causes.
+            raise TransientSourceError("ads.search failed: HTTPError") from None

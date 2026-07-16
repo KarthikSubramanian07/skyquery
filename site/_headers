@@ -4,12 +4,17 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 /styles.css
   Cache-Control: public, max-age=3600
 
 /app.js
   Cache-Control: public, max-age=3600
+
+/og.png
+  Cache-Control: public, max-age=86400
 
 /og.svg
   Cache-Control: public, max-age=86400

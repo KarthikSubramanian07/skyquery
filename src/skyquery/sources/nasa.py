@@ -56,12 +56,18 @@ class NasaSource(DataSource):
     def _live_fetch(self, operation: str, params: dict[str, Any]) -> Any:
         import httpx
 
+        from skyquery.errors import TransientSourceError
+
         if operation != "apod":
             raise ValueError(f"unsupported NASA operation {operation!r}")
         key = get_credential("nasa") or "DEMO_KEY"
         query: dict[str, Any] = {"api_key": key}
         if params.get("date"):
             query["date"] = params["date"]
-        response = httpx.get(_APOD_API, params=query, timeout=30.0)
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = httpx.get(_APOD_API, params=query, timeout=30.0)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPError:
+            # httpx embeds the full URL (including api_key) in the exception.
+            raise TransientSourceError("nasa.apod failed: HTTPError") from None

@@ -18,6 +18,7 @@ _LOGGER_NAME = "skyquery"
 # Patterns that look like secrets: long opaque tokens, and explicit key=value
 # pairs whose key names a credential. These are masked before any line is emitted.
 _TOKEN_RE = re.compile(r"\b[A-Za-z0-9_\-]{24,}\b")
+_BEARER_RE = re.compile(r"(?i)\b(bearer\s+)(\S+)")
 _KV_SECRET_RE = re.compile(
     r"(?i)\b((?:api[_-]?key|token|secret|password|bearer|ads[_-]?token|nasa[_-]?key)"
     r"\s*[=:]\s*)(\S+)"
@@ -27,6 +28,7 @@ _MASK = "***REDACTED***"
 
 def redact(text: str) -> str:
     """Mask anything that looks like a credential in ``text``."""
+    text = _BEARER_RE.sub(rf"\1{_MASK}", text)
     text = _KV_SECRET_RE.sub(rf"\1{_MASK}", text)
     return _TOKEN_RE.sub(_MASK, text)
 

@@ -85,6 +85,32 @@ class TestLogRedaction:
         out = redact(f"Authorization: Bearer {SECRET}")
         assert SECRET not in out
 
+    def test_redact_masks_authorization_bearer_header(self) -> None:
+        out = redact(f"Authorization: Bearer {SECRET}")
+        assert SECRET not in out
+        assert "Bearer ***REDACTED***" in out or "REDACTED" in out
+
+    def test_exception_chain_does_not_retain_cause(self) -> None:
+        """Live-path scrubbing must not keep httpx causes that embed secrets."""
+        from skyquery.errors import TransientSourceError
+        from skyquery.sources.base import DataSource, SourceContext
+
+        class Boom(DataSource):
+            source_id = "boom"
+            service_name = "Boom"
+
+            def _live_fetch(self, operation: str, params: dict[str, object]) -> object:
+                raise RuntimeError(f"api_key={SECRET} in url")
+
+        src = Boom(SourceContext(replay=False, offline=False))
+        with pytest.raises(TransientSourceError) as excinfo:
+            src.fetch("op", {})
+        err = excinfo.value
+        assert err.__cause__ is None
+        assert SECRET not in "".join(
+            __import__("traceback").format_exception(type(err), err, err.__traceback__)
+        )
+
     def test_event_output_never_contains_secret(self) -> None:
         stream = io.StringIO()
         configure_logging(level=logging.INFO, stream=stream)

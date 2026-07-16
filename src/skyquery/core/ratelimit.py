@@ -8,6 +8,7 @@ preference. The clock is injectable so tests are deterministic and never sleep.
 
 from __future__ import annotations
 
+import threading
 import time
 from collections import deque
 from collections.abc import Callable
@@ -38,16 +39,18 @@ class RateLimiter:
     sleep: Callable[[float], None] = time.sleep
     _calls: deque[float] = field(default_factory=deque, init=False, repr=False)
     _last: float | None = field(default=None, init=False, repr=False)
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
 
     def acquire(self) -> float:
         """Block until a call is permitted. Returns the seconds spent waiting."""
         waited = 0.0
         while True:
-            now = self.clock()
-            wait = self._required_wait(now)
-            if wait <= 0:
-                self._record(now)
-                return waited
+            with self._lock:
+                now = self.clock()
+                wait = self._required_wait(now)
+                if wait <= 0:
+                    self._record(now)
+                    return waited
             self.sleep(wait)
             waited += wait
 
