@@ -9,14 +9,23 @@ the Apophis demo offline the moment it is installed.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 from skyquery.core.cache import cache_key
-from skyquery.errors import ReplayError
+from skyquery.errors import ReplayError, ValidationError
 
 # Fixtures curated for the shipped offline demo and the test suite.
 PACKAGED_FIXTURES_DIR = Path(__file__).resolve().parent.parent / "_fixtures"
+
+_SAFE_SEGMENT = re.compile(r"^[A-Za-z0-9_.-]+$")
+
+
+def _safe_segment(value: str, *, what: str) -> str:
+    if not _SAFE_SEGMENT.fullmatch(value):
+        raise ValidationError(f"unsafe fixture {what}: {value!r}")
+    return value
 
 
 class FixtureStore:
@@ -39,8 +48,10 @@ class FixtureStore:
         self.record_dir = record_dir
 
     def _filename(self, source: str, operation: str, params: dict[str, Any]) -> str:
-        key = cache_key(source, operation, params)
-        return f"{source}__{operation}__{key[:16]}.json"
+        safe_source = _safe_segment(source, what="source")
+        safe_operation = _safe_segment(operation, what="operation")
+        key = cache_key(safe_source, safe_operation, params)
+        return f"{safe_source}__{safe_operation}__{key[:16]}.json"
 
     def load(self, source: str, operation: str, params: dict[str, Any]) -> Any:
         """Return the recorded payload for a request, or raise :class:`ReplayError`."""

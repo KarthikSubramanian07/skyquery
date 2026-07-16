@@ -8,6 +8,14 @@ from skyquery.core.convert import (
     angular_separation as _angular_separation,
 )
 from skyquery.core.crossmatch import CrossMatchResult, cross_match
+from skyquery.core.limits import (
+    clamp_literature_rows,
+    clamp_query_text,
+    clamp_radius_deg,
+    clamp_row_limit,
+    clamp_targets,
+    validate_ephemeris_window,
+)
 from skyquery.errors import NotFoundError
 from skyquery.models.catalog import CatalogTable
 from skyquery.models.coordinates import SkyPosition
@@ -77,6 +85,7 @@ def ephemeris(
     from skyquery.client import SkyQuery
 
     assert isinstance(app, SkyQuery)
+    validate_ephemeris_window(start, stop, step)
     eph = app.horizons.ephemerides(target, location=location, start=start, stop=stop, step=step)
     app.track(eph.provenance)
     return eph
@@ -104,6 +113,8 @@ def cone_search(
     from skyquery.client import SkyQuery
 
     assert isinstance(app, SkyQuery)
+    radius_deg = clamp_radius_deg(radius_deg)
+    row_limit = clamp_row_limit(row_limit, ceiling=app.settings.row_limit)
     if isinstance(center, str):
         obj = resolve_object(app, center)
         if obj.position is None:
@@ -131,6 +142,8 @@ def crossmatch_targets(
     from skyquery.client import SkyQuery
 
     assert isinstance(app, SkyQuery)
+    targets = clamp_targets(targets)
+    radius_deg = clamp_radius_deg(radius_deg)
     left: list[SkyPosition] = []
     for name in targets:
         obj = resolve_object(app, name)
@@ -151,6 +164,8 @@ def literature(app: object, query: str, *, prefer: str = "arxiv", rows: int = 5)
     from skyquery.client import SkyQuery
 
     assert isinstance(app, SkyQuery)
+    query = clamp_query_text(query)
+    rows = clamp_literature_rows(rows)
     use_ads = prefer == "ads" and get_credential("ads") is not None
     papers = (
         app.ads.search(query, rows=rows) if use_ads else app.arxiv.search(query, max_results=rows)

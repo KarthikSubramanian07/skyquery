@@ -110,9 +110,12 @@ class DataSource(ABC):
             except SourceError:
                 raise
             except Exception as exc:
+                # Do not chain the original exception: httpx embeds full request
+                # URLs (including api_key query params) in HTTPStatusError, and
+                # ADS puts Bearer tokens on the request object. Scrub to type only.
                 raise TransientSourceError(
                     f"{self.source_id}.{operation} failed: {type(exc).__name__}"
-                ) from exc
+                ) from None
 
         return retry_with_backoff(
             call,

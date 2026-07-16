@@ -14,14 +14,18 @@
   <meta property="og:url" content="https://skyquery-mcp.pages.dev/" />
   <meta property="og:title" content="SkyQuery — The sky, queryable." />
   <meta property="og:description" content="An open-source local MCP server that lets your AI assistant query real astronomy data, normalized with citable provenance." />
-  <meta property="og:image" content="https://skyquery-mcp.pages.dev/og.svg" />
-  <meta property="og:image:alt" content="SkyQuery terminal answering an asteroid Apophis close-approach query." />
+  <meta property="og:image" content="https://skyquery-mcp.pages.dev/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="SkyQuery — The sky, queryable. Local MCP server for real astronomy data." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="SkyQuery — The sky, queryable." />
   <meta name="twitter:description" content="Real astronomy data for your AI assistant. Object lookups, ephemerides, cross-matches, and literature, normalized with provenance." />
-  <meta name="twitter:image" content="https://skyquery-mcp.pages.dev/og.svg" />
+  <meta name="twitter:image" content="https://skyquery-mcp.pages.dev/og.png" />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/og.png" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -30,20 +34,37 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "SkyQuery",
-    "applicationCategory": "DeveloperApplication",
-    "applicationSubCategory": "MCP Server",
-    "operatingSystem": "macOS, Linux, Windows",
-    "description": "Open-source local MCP server that lets AI assistants query real astronomy data (object lookups, asteroid ephemerides, catalog cross-matches, literature), normalized with citable provenance.",
-    "url": "https://skyquery-mcp.pages.dev/",
-    "downloadUrl": "https://github.com/KarthikSubramanian07/skyquery",
-    "softwareVersion": "0.1.0",
-    "license": "https://opensource.org/license/mit",
-    "isAccessibleForFree": true,
-    "keywords": "astronomy, MCP, ephemeris, SIMBAD, JPL Horizons, VizieR, ADS, cross-match, AI assistant",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "programmingLanguage": "Python"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "SkyQuery",
+        "url": "https://skyquery-mcp.pages.dev/",
+        "description": "The sky, queryable. A local open-source MCP server for real astronomy data with citable provenance.",
+        "publisher": {
+          "@type": "Person",
+          "name": "Karthik Subramanian",
+          "url": "https://github.com/KarthikSubramanian07"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "SkyQuery",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "MCP Server",
+        "operatingSystem": "macOS, Linux, Windows",
+        "description": "Open-source local MCP server that lets AI assistants query real astronomy data (object lookups, asteroid ephemerides, catalog cross-matches, literature), normalized with citable provenance.",
+        "url": "https://skyquery-mcp.pages.dev/",
+        "downloadUrl": "https://github.com/KarthikSubramanian07/skyquery",
+        "softwareVersion": "0.1.0",
+        "license": "https://opensource.org/license/mit",
+        "isAccessibleForFree": true,
+        "keywords": "astronomy, MCP, ephemeris, SIMBAD, JPL Horizons, VizieR, ADS, cross-match, AI assistant",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "programmingLanguage": "Python",
+        "codeRepository": "https://github.com/KarthikSubramanian07/skyquery",
+        "image": "https://skyquery-mcp.pages.dev/og.png"
+      }
+    ]
   }
   </script>
 </head>

@@ -47,9 +47,16 @@ class GaiaSource(DataSource):
 
         from skyquery.sources._tables import table_to_payload
 
+        previous = getattr(Gaia, "ROW_LIMIT", None)
         Gaia.ROW_LIMIT = int(params["row_limit"])
-        coord = SkyCoord(ra=params["ra"] * u.deg, dec=params["dec"] * u.deg, frame="icrs")
-        job = Gaia.cone_search_async(coord, radius=params["radius"] * u.deg)
-        table = job.get_results()
+        try:
+            coord = SkyCoord(ra=params["ra"] * u.deg, dec=params["dec"] * u.deg, frame="icrs")
+            job = Gaia.cone_search_async(coord, radius=params["radius"] * u.deg)
+            table = job.get_results()
+        finally:
+            if previous is None:
+                delattr(Gaia, "ROW_LIMIT")
+            else:
+                Gaia.ROW_LIMIT = previous
         available = [c for c in _COLUMNS if c in table.colnames]
         return table_to_payload(table, columns=available)

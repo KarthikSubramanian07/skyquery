@@ -74,7 +74,7 @@ def get_ephemeris(
     target: str,
     start: str = Field(description="UT start date, YYYY-MM-DD or YYYY-MM-DD HH:MM"),
     stop: str = Field(description="UT stop date, YYYY-MM-DD or YYYY-MM-DD HH:MM"),
-    step: str = "1h",
+    step: str = Field(default="1h", description="Sampling step such as 1h, 30m, or 1d"),
     observer_location: str = "500@399",
 ) -> Ephemeris:
     """Compute a solar-system body's apparent ephemeris from JPL Horizons.
@@ -83,7 +83,7 @@ def get_ephemeris(
     and V magnitude for a body such as "99942 Apophis", "Ceres", or "C/2023 A3".
     ``observer_location`` is a Horizons code; "500@399" is geocentric. This is the
     capability the other astronomy MCP servers skip, so prefer it for "where is
-    <body> on <date>" questions.
+    <body> on <date>" questions. Windows that would exceed ~2000 samples are rejected.
     """
     return services.ephemeris(
         _app, target, start=start, stop=stop, step=step, location=observer_location
@@ -117,15 +117,16 @@ def apophis_demo(with_paper: bool = True) -> ApophisReport:
 @mcp.tool()
 def cone_search(
     center: str,
-    radius_deg: float = 0.05,
+    radius_deg: float = Field(default=0.05, gt=0, le=5.0),
     catalog: str = "gaia",
-    row_limit: int = 20,
+    row_limit: int = Field(default=20, ge=1, le=100),
 ) -> CatalogTable:
     """Return catalog sources within a radius of a position.
 
     ``center`` may be an object name (resolved via SIMBAD) or "RA DEC" in degrees.
     ``catalog`` is "gaia" for Gaia DR3, or a VizieR catalog id such as "II/246"
-    for 2MASS. Every column is unit-tagged.
+    for 2MASS. Every column is unit-tagged. Radius is capped at 5 degrees and
+    ``row_limit`` at 100 to protect free public services.
     """
     parsed = _parse_center(center)
     return services.cone_search(_app, parsed, radius_deg, catalog=catalog, row_limit=row_limit)
@@ -141,13 +142,15 @@ class CrossMatchOutput(BaseModel):
 
 @mcp.tool()
 def crossmatch(
-    targets: list[str], catalog: str = "gaia", tolerance_arcsec: float = 5.0
+    targets: list[str],
+    catalog: str = "gaia",
+    tolerance_arcsec: float = Field(default=5.0, gt=0, le=60.0),
 ) -> CrossMatchOutput:
     """Match a list of target names to their nearest source in a catalog.
 
     Resolves each name to a position, then finds the nearest catalog source within
     ``tolerance_arcsec``. Reports both matches (with separation) and any targets
-    with no source inside the tolerance.
+    with no source inside the tolerance. At most 50 targets per call.
     """
     result = services.crossmatch_targets(
         _app, targets, catalog=catalog, tolerance_arcsec=tolerance_arcsec
@@ -169,12 +172,16 @@ def crossmatch(
 # Literature
 # --------------------------------------------------------------------------- #
 @mcp.tool()
-def search_literature(query: str, rows: int = 5, prefer: str = "ads") -> list[Paper]:
+def search_literature(
+    query: str,
+    rows: int = Field(default=5, ge=1, le=50),
+    prefer: str = "ads",
+) -> list[Paper]:
     """Search the astronomy literature (NASA ADS, or arXiv when no ADS key is set).
 
     Returns normalized paper records with title, authors, year, bibcode, and a
     resolvable URL. ADS needs a free token configured via `skyquery login`; without
-    one, SkyQuery falls back to arXiv automatically.
+    one, SkyQuery falls back to arXiv automatically. ``rows`` is capped at 50.
     """
     return services.literature(_app, query, prefer=prefer, rows=rows)
 
