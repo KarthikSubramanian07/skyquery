@@ -6,9 +6,9 @@
 
   /* ---- Theme toggle (persisted, respects system default) ---- */
   const root = document.documentElement;
+  // Dark is always the default; only an explicit user toggle (persisted) overrides it.
   const saved = localStorage.getItem("sq-theme");
-  if (saved) root.setAttribute("data-theme", saved);
-  else if (matchMedia("(prefers-color-scheme: light)").matches) root.setAttribute("data-theme", "light");
+  root.setAttribute("data-theme", saved === "light" ? "light" : "dark");
   document.getElementById("theme")?.addEventListener("click", () => {
     const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
     root.setAttribute("data-theme", next);

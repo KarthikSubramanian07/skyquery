@@ -138,7 +138,7 @@ a:hover { text-decoration: underline; }
   margin: 0 0 1rem;
 }
 
-.lead { font-size: 1.125rem; color: var(--fg-secondary); max-width: 68ch; }
+.lead { font-size: 1.125rem; color: var(--fg-secondary); max-width: none; }
 
 /* Buttons */
 .btn {
@@ -256,14 +256,14 @@ a:hover { text-decoration: underline; }
 
 /* Bands */
 .band { padding-block: clamp(4rem, 8vw, 7.5rem); border-top: 1px solid var(--border-subtle); }
-.band h2 { max-width: 20ch; }
+.band h2 { max-width: none; }
 /* Blueprint dot grid drawn as an SVG texture (not a CSS gradient). */
 .grid-bg {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ccircle cx='1' cy='1' r='1' fill='%2326262b'/%3E%3C/svg%3E");
   background-size: 28px 28px;
 }
 
-.crosslist { list-style: none; padding: 0; margin: 1.8rem 0 0; display: grid; gap: 0.9rem; max-width: 70ch; }
+.crosslist { list-style: none; padding: 0; margin: 1.8rem 0 0; display: grid; gap: 0.9rem; max-width: none; }
 .crosslist li { position: relative; padding-left: 1.9rem; color: var(--fg-secondary); font-family: var(--font-mono); font-size: 0.9rem; }
 .crosslist li::before { content: "✕"; position: absolute; left: 0; color: #ff6b6b; }
 
@@ -299,7 +299,7 @@ a:hover { text-decoration: underline; }
 .manifest__row span:nth-child(2) { color: var(--fg-secondary); }
 .manifest .ok { color: var(--ok); }
 .manifest .warn { color: var(--warn); }
-.note { color: var(--fg-muted); font-size: 0.85rem; max-width: 75ch; margin-top: 1.4rem; }
+.note { color: var(--fg-muted); font-size: 0.85rem; max-width: none; margin-top: 1.4rem; }
 
 /* Install steps */
 .steps { display: grid; gap: 1.5rem; }
@@ -324,7 +324,7 @@ a:hover { text-decoration: underline; }
 .copy.is-done { color: var(--ok); border-color: var(--ok); }
 
 /* Answer block */
-.answer { margin: 2rem 0 0; padding: 1.6rem 1.8rem; background: var(--bg-surface); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; font-size: 1.15rem; color: var(--fg); max-width: 68ch; }
+.answer { margin: 2rem 0 0; padding: 1.6rem 1.8rem; background: var(--bg-surface); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; font-size: 1.15rem; color: var(--fg); max-width: none; }
 .answer cite { display: block; margin-top: 0.8rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg-muted); font-style: normal; }
 
 /* Footer */
