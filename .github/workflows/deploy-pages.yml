@@ -17,7 +17,7 @@ jobs:
     name: Deploy site to Cloudflare Pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Deploys the static site/ directory to the "skyquery-mcp" Pages project,
       # which serves the production URL https://skyquery-mcp.pages.dev.
