@@ -94,7 +94,7 @@ big is it, and what is a recent paper about it?"*
 
 ## Deploying the landing page (maintainers only)
 
-The marketing site in `site/` deploys to `https://skyquery.pages.dev` via Cloudflare
+The marketing site in `site/` deploys to `https://skyquery-mcp.pages.dev` via Cloudflare
 Pages. Automatic deploys on push need two GitHub repo secrets:
 
 1. `CLOUDFLARE_API_TOKEN`, a token with the **Cloudflare Pages: Edit** permission
@@ -106,5 +106,5 @@ Add them under the repo's *Settings → Secrets and variables → Actions*. The
 that touches it. To deploy manually:
 
 ```bash
-npx wrangler pages deploy site --project-name=skyquery
+npx wrangler pages deploy site --project-name=skyquery-mcp
 ```

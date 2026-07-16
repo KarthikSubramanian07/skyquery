@@ -15,7 +15,7 @@ Runs entirely on your machine.
 [![Typed](https://img.shields.io/badge/typed-pyright%20strict-5FE3D6)](pyproject.toml)
 [![Built on astropy](https://img.shields.io/badge/built%20on-astropy%20%C2%B7%20astroquery-262D3D)](https://www.astropy.org/)
 
-[**Website**](https://skyquery.pages.dev) · [Install](#install-in-under-five-minutes) · [The demo](#the-demo-that-sells-it) · [How it works](#how-it-works) · [Tools](#the-tool-surface)
+[**Website**](https://skyquery-mcp.pages.dev) · [Install](#install-in-under-five-minutes) · [The demo](#the-demo-that-sells-it) · [How it works](#how-it-works) · [Tools](#the-tool-surface)
 
 </div>
 

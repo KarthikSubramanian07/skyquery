@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://skyquery.pages.dev/sitemap.xml
+Sitemap: https://skyquery-mcp.pages.dev/sitemap.xml

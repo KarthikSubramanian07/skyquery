@@ -13,7 +13,7 @@ SkyQuery's numbers or its network path.
   except direct calls to the public astronomy services.
 - **The marketing site is the one exception**, and it is deliberately just a static
   page (`site/`) with no data surface, deployed to Cloudflare Pages at
-  `skyquery.pages.dev`. It never touches user queries or keys; it exists to explain
+  `skyquery-mcp.pages.dev`. It never touches user queries or keys; it exists to explain
   the tool and show the demo.
 
 ## Cost model
