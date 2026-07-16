@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.python-version
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.ruff_cache/
+.pyright/
+
+# SkyQuery local state (NEVER commit secrets, cache, or downloaded data)
+.env
+.env.*
+*.key
+*.token
+skyquery.sqlite3
+/cache/
+/downloads/
+*.fits
+*.fits.gz
+*.vot
+*.votable
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Node (landing site tooling only)
+node_modules/
+site/.wrangler/
