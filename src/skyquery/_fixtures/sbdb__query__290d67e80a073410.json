@@ -1,0 +1,17 @@
+{
+  "fullname": "99942 Apophis (2004 MN4)",
+  "neo": true,
+  "pha": true,
+  "orbit_class": "Aten",
+  "diameter": 0.34,
+  "H": 19.09,
+  "albedo": 0.35,
+  "rot_per": 30.56,
+  "orbit": {
+    "e": 0.191,
+    "a": 0.922,
+    "q": 0.746,
+    "i": 3.34,
+    "per": 324.0
+  }
+}

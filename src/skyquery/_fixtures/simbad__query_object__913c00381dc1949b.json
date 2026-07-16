@@ -1,0 +1,21 @@
+{
+  "main_id": "M  31",
+  "ra": 10.684708333333333,
+  "dec": 41.268750000000004,
+  "otype": "AGN",
+  "sp_type": null,
+  "plx_value": null,
+  "pmra": null,
+  "pmdec": null,
+  "rvz_radvel": -300.0,
+  "rvz_redshift": -0.0010001920937326991,
+  "flux": {
+    "V": 3.440000057220459
+  },
+  "ids": [
+    "M  31",
+    "NAME Andromeda",
+    "NGC  224",
+    "2C 56"
+  ]
+}
