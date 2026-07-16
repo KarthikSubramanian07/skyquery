@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0a0c"/>
+  <g fill="#e7ecf4">
+    <circle cx="140" cy="120" r="2" opacity="0.7"/>
+    <circle cx="320" cy="80" r="1.4" opacity="0.5"/>
+    <circle cx="1040" cy="90" r="2.4" fill="#f6b44c" opacity="0.9"/>
+    <circle cx="980" cy="500" r="1.6" opacity="0.6"/>
+    <circle cx="220" cy="520" r="1.8" fill="#f6b44c" opacity="0.7"/>
+    <circle cx="620" cy="60" r="1.2" opacity="0.4"/>
+    <circle cx="1120" cy="300" r="1.5" opacity="0.5"/>
+  </g>
+  <text x="90" y="250" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="26" letter-spacing="6" fill="#f6b44c">LOCAL MCP SERVER · REAL ASTRONOMY DATA</text>
+  <text x="86" y="360" font-family="'Space Grotesk', sans-serif" font-size="104" font-weight="700" fill="#e7ecf4">The sky, queryable.</text>
+  <text x="90" y="430" font-family="'Inter', sans-serif" font-size="30" fill="#a6b1c4">Object lookups, ephemerides, cross-matches, and literature,</text>
+  <text x="90" y="472" font-family="'Inter', sans-serif" font-size="30" fill="#a6b1c4">normalized with provenance you can cite.</text>
+  <g font-family="'JetBrains Mono', ui-monospace, monospace" font-size="24">
+    <text x="90" y="560" fill="#5fe3d6">✦ SkyQuery</text>
+    <text x="330" y="560" fill="#6c7889">MIT · Python · runs on your machine</text>
+  </g>
+</svg>

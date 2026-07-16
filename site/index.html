@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SkyQuery — The sky, queryable. Real astronomy data for AI assistants</title>
+  <meta name="description" content="SkyQuery is an open-source local MCP server that lets your AI assistant query real astronomy data: object lookups, asteroid ephemerides, catalog cross-matches, and the literature, all normalized with citable provenance. Runs entirely on your machine." />
+  <link rel="canonical" href="https://skyquery.pages.dev/" />
+  <meta name="theme-color" content="#06080D" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F8F6F1" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://skyquery.pages.dev/" />
+  <meta property="og:title" content="SkyQuery — The sky, queryable." />
+  <meta property="og:description" content="An open-source local MCP server that lets your AI assistant query real astronomy data, normalized with citable provenance." />
+  <meta property="og:image" content="https://skyquery.pages.dev/og.svg" />
+  <meta property="og:image:alt" content="SkyQuery terminal answering an asteroid Apophis close-approach query." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SkyQuery — The sky, queryable." />
+  <meta name="twitter:description" content="Real astronomy data for your AI assistant. Object lookups, ephemerides, cross-matches, and literature, normalized with provenance." />
+  <meta name="twitter:image" content="https://skyquery.pages.dev/og.svg" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SkyQuery",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "MCP Server",
+    "operatingSystem": "macOS, Linux, Windows",
+    "description": "Open-source local MCP server that lets AI assistants query real astronomy data (object lookups, asteroid ephemerides, catalog cross-matches, literature), normalized with citable provenance.",
+    "url": "https://skyquery.pages.dev/",
+    "downloadUrl": "https://github.com/KarthikSubramanian07/skyquery",
+    "softwareVersion": "0.1.0",
+    "license": "https://opensource.org/license/mit",
+    "isAccessibleForFree": true,
+    "keywords": "astronomy, MCP, ephemeris, SIMBAD, JPL Horizons, VizieR, ADS, cross-match, AI assistant",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "programmingLanguage": "Python"
+  }
+  </script>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <a class="skip" href="#install">Skip to install</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="SkyQuery home">
+        <span class="brand__mark" aria-hidden="true">✦</span>
+        <span class="brand__name">SkyQuery</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#sources">Sources</a>
+        <a href="#install">Install</a>
+      </nav>
+      <div class="nav__actions">
+        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+          <span class="theme-sun" aria-hidden="true">☀</span>
+          <span class="theme-moon" aria-hidden="true">☾</span>
+        </button>
+        <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
+          <span aria-hidden="true">★</span> GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero wrap">
+      <p class="eyebrow">Local MCP server · Real astronomy data</p>
+      <h1 class="hero__title">The sky, queryable.</h1>
+      <p class="hero__sub">
+        Point your AI assistant at the real sky. Object lookups, asteroid ephemerides,
+        catalog cross-matches, and the literature, all normalized with provenance you can cite.
+        It runs entirely on your machine.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--accent" href="#install">Get started</a>
+        <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
+          <span aria-hidden="true">★</span> Star on GitHub
+        </a>
+      </div>
+
+      <div class="term" role="img"
+        aria-label="Demo: asking SkyQuery when asteroid Apophis makes its close approach; it returns 2029-04-13 at 0.000257 astronomical units, about 0.10 lunar distances, sourced from JPL Horizons.">
+        <div class="term__bar" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <em>skyquery — apophis close approach</em>
+        </div>
+        <pre class="term__body" aria-hidden="true"></pre>
+        <button class="term__replay" type="button" hidden>↻ Replay</button>
+      </div>
+      <p class="hero__foot">Free forever · MIT · No account · No telemetry · Nothing leaves your machine</p>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="band wrap" id="problem">
+      <p class="eyebrow">The problem</p>
+      <h2>The data is public. The interfaces are not kind.</h2>
+      <p class="lead">
+        To answer one ordinary question you touch a JPL prompt, a SIMBAD form, and ADS query
+        syntax, each with its own units and conventions. Every astronomer relearns this plumbing,
+        and everyone ends up copying numbers between tabs by hand.
+      </p>
+      <ul class="crosslist">
+        <li>Names must resolve to coordinates, coordinates to catalog rows, rows to papers, all by hand.</li>
+        <li>Ask an LLM directly and it will happily invent an ephemeris that looks right and is wrong.</li>
+        <li>Nothing comes back with the units, the reference frame, or a citation attached.</li>
+      </ul>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="band wrap grid-bg" id="how">
+      <p class="eyebrow">How it works</p>
+      <h2>One schema. Every value sourced.</h2>
+      <div class="flow" aria-hidden="true">
+        <div class="flow__node">Your assistant</div>
+        <div class="flow__beam"><span>MCP</span></div>
+        <div class="flow__node flow__node--hub">SkyQuery</div>
+        <div class="flow__beam flow__beam--return"><span>normalized + provenance</span></div>
+        <div class="flow__node flow__node--sources">SIMBAD · Horizons<br />VizieR · Gaia · ADS</div>
+      </div>
+      <div class="cols">
+        <div class="col">
+          <h3>One coordinate frame</h3>
+          <p>Every position lands in ICRS degrees with its epoch explicit. No more guessing hourangle versus degree, J2000 versus ICRS.</p>
+        </div>
+        <div class="col">
+          <h3>Every value sourced</h3>
+          <p>Each field carries the service that produced it, the exact query, and the acknowledgment that service asks you to cite.</p>
+        </div>
+        <div class="col">
+          <h3>Deterministic, not guessed</h3>
+          <p>The assistant reads real results. It does not invent numbers. A confidently wrong coordinate is the one failure a scientist cannot forgive.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAPABILITIES -->
+    <section class="band wrap" id="capabilities">
+      <p class="eyebrow">Capabilities</p>
+      <h2>The working astronomer's toolkit, as tools an AI can drive.</h2>
+      <div class="features">
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">✦</div>
+          <h3>Object intelligence</h3>
+          <p>Resolve any name to coordinates, cross-IDs, and measured properties via SIMBAD, NED, and VizieR.</p>
+          <code>resolve_object()</code>
+        </article>
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">☄</div>
+          <h3>Asteroid & comet ephemerides</h3>
+          <p>Precise positions, distances, and magnitudes for any solar-system body, straight from JPL Horizons.</p>
+          <code>get_ephemeris()</code>
+        </article>
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">⊹</div>
+          <h3>Catalog & cross-match</h3>
+          <p>Cone, box, and ADQL queries across Gaia, SDSS, 2MASS, and friends, plus positional cross-matching.</p>
+          <code>cone_search()</code>
+        </article>
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">✧</div>
+          <h3>Literature</h3>
+          <p>Find papers, pull abstracts and bibcodes, and connect an object to what measured it, via ADS and arXiv.</p>
+          <code>search_literature()</code>
+        </article>
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">✵</div>
+          <h3>Unit-correct analysis</h3>
+          <p>Coordinate transforms, distance and magnitude math, all dimensioned and frame-correct via astropy.</p>
+          <code>convert_frame()</code>
+        </article>
+        <article class="feature">
+          <div class="feature__icon" aria-hidden="true">◐</div>
+          <h3>Observation planning</h3>
+          <p>Airmass curves, rise and set times, and observability windows for a site and a night, via astroplan.</p>
+          <code>observability()</code>
+        </article>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="band wrap" id="sources">
+      <p class="eyebrow">Data sources</p>
+      <h2>It wraps the real ecosystem, and credits it loudly.</h2>
+      <div class="manifest" role="table" aria-label="Data sources SkyQuery wraps">
+        <div class="manifest__row manifest__head" role="row">
+          <span role="columnheader">Service</span>
+          <span role="columnheader">What</span>
+          <span role="columnheader">Access</span>
+        </div>
+        <div class="manifest__row" role="row"><span>SIMBAD</span><span>Object identifiers, coordinates, and metadata</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>JPL Horizons</span><span>Solar-system ephemerides and state vectors</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>JPL SBDB</span><span>Small-body physical and orbital parameters</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>Gaia · SDSS · 2MASS</span><span>Astrometry and photometry catalogs</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>VizieR</span><span>Thousands of published catalogs</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>NASA ADS</span><span>The astronomy literature</span><span class="warn">free key</span></div>
+        <div class="manifest__row" role="row"><span>arXiv</span><span>astro-ph preprints</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>MAST</span><span>HST / JWST / TESS / Kepler data products</span><span class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span>NASA Open APIs</span><span>APOD and the wonder layer</span><span class="warn">DEMO_KEY</span></div>
+      </div>
+      <p class="note">
+        SkyQuery is an independent open-source client and is not affiliated with, or endorsed by,
+        NASA, JPL, CDS/Strasbourg, STScI, ESA, or the Astropy project. It is a normalization and
+        MCP layer on top of astroquery, which it credits plainly.
+      </p>
+    </section>
+
+    <!-- INSTALL -->
+    <section class="band wrap" id="install">
+      <p class="eyebrow">Install</p>
+      <h2>Two steps. Then ask the sky anything.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step__n">1</div>
+          <div class="step__body">
+            <h3>Install it</h3>
+            <div class="tabs" data-tabs>
+              <div class="tabs__list" role="tablist">
+                <button role="tab" class="is-active" data-tab="uv">uv</button>
+                <button role="tab" data-tab="pipx">pipx</button>
+                <button role="tab" data-tab="src">from source</button>
+              </div>
+              <div class="code" data-panel="uv">
+                <pre><span class="prompt">$</span> uv tool install skyquery-mcp</pre>
+                <button class="copy" type="button" data-copy="uv tool install skyquery-mcp" aria-label="Copy command">Copy</button>
+              </div>
+              <div class="code" data-panel="pipx" hidden>
+                <pre><span class="prompt">$</span> pipx install skyquery-mcp</pre>
+                <button class="copy" type="button" data-copy="pipx install skyquery-mcp" aria-label="Copy command">Copy</button>
+              </div>
+              <div class="code" data-panel="src" hidden>
+                <pre><span class="prompt">$</span> git clone https://github.com/KarthikSubramanian07/skyquery
+<span class="prompt">$</span> cd skyquery &amp;&amp; uv tool install .</pre>
+                <button class="copy" type="button" data-copy="git clone https://github.com/KarthikSubramanian07/skyquery && cd skyquery && uv tool install ." aria-label="Copy commands">Copy</button>
+              </div>
+            </div>
+            <p class="req">Requires Python 3.12+. Try it offline right now: <code>skyquery demo</code></p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__n">2</div>
+          <div class="step__body">
+            <h3>Point your assistant at it</h3>
+            <p class="req">Add this stdio server to your MCP client config (for example Claude Desktop):</p>
+            <div class="code">
+              <pre>{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"skyquery"</span>: {
+      <span class="k">"command"</span>: <span class="s">"skyquery-mcp"</span>
+    }
+  }
+}</pre>
+              <button class="copy" type="button" data-copy='{&#10;  "mcpServers": {&#10;    "skyquery": {&#10;      "command": "skyquery-mcp"&#10;    }&#10;  }&#10;}' aria-label="Copy config">Copy</button>
+            </div>
+            <p class="req">Optional free keys unlock more: <code>skyquery login ads</code> and <code>skyquery login nasa</code>. They go straight to your OS keychain, never a file.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="band wrap" id="demo">
+      <p class="eyebrow">The demo that sells it</p>
+      <h2>"Where is Apophis, how big is it, and what's the latest paper?"</h2>
+      <p class="lead">
+        JPL Horizons, the Small-Body Database, and the literature, answered in one breath, with
+        the units, the frame, and the citations intact. That single query is the whole pitch.
+      </p>
+      <blockquote class="answer">
+        99942 Apophis is about 0.34 km across. On 2029-04-13 it passes 0.000257 AU from Earth,
+        roughly 0.10 lunar distances, inside geostationary orbit.
+        <cite>Source: JPL Horizons + JPL SBDB, frame ICRS.</cite>
+      </blockquote>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="#top">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <span class="brand__name">SkyQuery</span>
+        </a>
+        <p>The sky, queryable. Your questions, real data, one conversation.</p>
+        <p class="footer__meta">MIT · v0.1.0 · Runs on your machine</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h4>Product</h4>
+          <a href="#capabilities">Capabilities</a>
+          <a href="#sources">Sources</a>
+          <a href="#install">Install</a>
+        </div>
+        <div>
+          <h4>Community</h4>
+          <a href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/issues" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/discussions" target="_blank" rel="noopener">Discussions</a>
+        </div>
+        <div>
+          <h4>Support it</h4>
+          <a class="coffee" href="https://buymeacoffee.com/winnerkarthik" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap footer__credit">
+      Built with astropy, astroquery, and astroplan. Data courtesy of SIMBAD (CDS), JPL, VizieR,
+      Gaia/ESA, MAST/STScI, and NASA ADS. SkyQuery is independent and unaffiliated with any of them.
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
