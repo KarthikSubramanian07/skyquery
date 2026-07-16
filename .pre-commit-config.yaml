@@ -1,0 +1,28 @@
+# Pre-commit hooks: ruff (lint + format) and pyright, run on staged files.
+# Install with:  pre-commit install
+# These run locally against your working tree; they never touch your remote.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.21
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.360
+    hooks:
+      - id: pyright
+        additional_dependencies: []
+
+  - repo: local
+    hooks:
+      - id: pytest-offline
+        name: pytest (replay mode, offline)
+        entry: pytest -q
+        language: system
+        pass_filenames: false
+        types: [python]
+        env:
+          SKYQUERY_REPLAY: "1"
+          SKYQUERY_OFFLINE: "1"
