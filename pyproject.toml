@@ -53,7 +53,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://skyquery.pages.dev"
+Homepage = "https://skyquery-mcp.pages.dev"
 Repository = "https://github.com/KarthikSubramanian07/skyquery"
 Issues = "https://github.com/KarthikSubramanian07/skyquery/issues"
 "Buy Me A Coffee" = "https://buymeacoffee.com/winnerkarthik"

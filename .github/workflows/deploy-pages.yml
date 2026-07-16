@@ -19,13 +19,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Deploys the static site/ directory to the "skyquery" Pages project, which
-      # serves the production URL https://skyquery.pages.dev (no random subdomain).
-      # Requires two repo secrets: CLOUDFLARE_API_TOKEN (Pages:Edit) and
-      # CLOUDFLARE_ACCOUNT_ID. See SETUP.md for the one-time setup.
+      # Deploys the static site/ directory to the "skyquery-mcp" Pages project,
+      # which serves the production URL https://skyquery-mcp.pages.dev.
+      # Requires two repo secrets: CLOUDFLARE_API_TOKEN (with Pages:Edit) and
+      # CLOUDFLARE_ACCOUNT_ID. Until they are set the step is skipped, so this
+      # workflow stays green rather than failing red. See SETUP.md.
+      - name: Check for Cloudflare credentials
+        id: creds
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "$CF_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN not set; skipping deploy. See SETUP.md."
+          fi
+
       - name: Publish to Cloudflare Pages
+        if: steps.creds.outputs.ready == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=skyquery --branch=main
+          command: pages deploy site --project-name=skyquery-mcp --branch=main
