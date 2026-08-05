@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 from pydantic import BaseModel, Field
 
 from skyquery import services
@@ -33,7 +33,7 @@ from skyquery.services.operations import ApophisReport, ObjectDossier
 from skyquery.sources.nasa import AstronomyPicture
 from skyquery.sources.sbdb import SmallBody
 
-mcp = FastMCP("SkyQuery")
+mcp = MCPServer("SkyQuery")
 
 # One shared client for the process. Replay/live is governed by the environment
 # (SKYQUERY_REPLAY), so the server is deterministic and offline-safe by default.
