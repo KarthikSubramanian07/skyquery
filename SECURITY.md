@@ -8,7 +8,7 @@ Security fixes are applied to the latest release on `main`.
 
 Please **do not** open a public GitHub issue for security-sensitive reports.
 
-Email **winnerkarthik07@gmail.com** with:
+Email **karthik [dot] subramanian [at] berkeley [dot] edu** with:
 
 - A description of the issue and its impact
 - Steps to reproduce, or a proof of concept
