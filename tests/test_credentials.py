@@ -126,5 +126,7 @@ class TestLogRedaction:
         logger = get_logger()
         for i in range(20):
             event(logger, logging.INFO, "request", i=i, ads_token=SECRET, bearer=SECRET)
+            # Deliberately log a fake secret to prove the redactor scrubs it; the
+            # assertion below fails if it ever reaches the stream in clear text.
             logger.info("inline mention token=%s", SECRET)
         assert SECRET not in stream.getvalue()

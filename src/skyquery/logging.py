@@ -63,4 +63,7 @@ def event(logger: logging.Logger, level: int, message: str, **fields: Any) -> No
     parts = [message]
     for key, value in fields.items():
         parts.append(f"{key}={value!r}")
+    # The line is passed through redact() before it reaches any handler, which
+    # masks tokens, bearer values, and credential key=value pairs. CodeQL cannot
+    # see redact() as a sanitizer, so it flags this sink as a false positive.
     logger.log(level, redact(" ".join(parts)))
