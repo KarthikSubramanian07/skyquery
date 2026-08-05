@@ -42,9 +42,8 @@ class ArxivSource(DataSource):
         )
 
     def _live_fetch(self, operation: str, params: dict[str, Any]) -> Any:
-        import xml.etree.ElementTree as ET
-
         import httpx
+        from defusedxml.ElementTree import fromstring as _xml_fromstring
 
         response = httpx.get(
             _ARXIV_API,
@@ -58,7 +57,7 @@ class ArxivSource(DataSource):
         )
         response.raise_for_status()
         ns = {"a": "http://www.w3.org/2005/Atom"}
-        root = ET.fromstring(response.text)
+        root = _xml_fromstring(response.text)
         entries: list[dict[str, Any]] = []
         for node in root.findall("a:entry", ns):
             raw_id = _text(node.find("a:id", ns))

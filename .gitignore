@@ -39,3 +39,4 @@ skyquery.sqlite3
 # Node (landing site tooling only)
 node_modules/
 site/.wrangler/
+uv.lock

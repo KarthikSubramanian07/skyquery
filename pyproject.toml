@@ -29,10 +29,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "mcp[cli]>=1.28,<2",
+    "mcp[cli]>=2,<3",
     "pydantic>=2.11,<3",
     "astropy>=6.1",
     "astroquery>=0.4.7",
+    "defusedxml>=0.7",
     "scipy>=1.11",
     "astroplan>=0.10",
     "pyvo>=1.5",
@@ -87,12 +88,14 @@ ignore = ["PLR0913", "PLR2004", "PLR0911", "PLR0912", "PLR0915", "PLC0415"]
 include = ["src", "tests"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-# astropy and astroquery ship incomplete inline type information, so strict mode
-# raises false positives at every call into them (SkyCoord/Quantity attribute
-# access, Table indexing, astroquery return shapes). We keep strict mode for our
-# own logic and disable only the diagnostics that fire purely at that untyped
-# third-party boundary. See DECISIONS.md.
+# astropy, astroquery, and the mcp 2.0 SDK ship incomplete inline type
+# information (mcp 2.0.0 has no py.typed marker yet), so strict mode raises false
+# positives at every call into them (SkyCoord/Quantity attribute access, Table
+# indexing, astroquery return shapes, the @mcp.tool() decorator). We keep strict
+# mode for our own logic and disable only the diagnostics that fire purely at
+# that untyped third-party boundary. See DECISIONS.md.
 reportMissingTypeStubs = false
+reportUntypedFunctionDecorator = false
 reportUnknownMemberType = false
 reportUnknownArgumentType = false
 reportUnknownVariableType = false

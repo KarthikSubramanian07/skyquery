@@ -12,6 +12,11 @@ concurrency:
   group: deploy-pages
   cancel-in-progress: true
 
+# Least privilege: the deploy only reads the repo; the Cloudflare token (a repo
+# secret) carries the deploy permission, not the workflow's GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Deploy site to Cloudflare Pages
