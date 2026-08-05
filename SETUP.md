@@ -95,16 +95,13 @@ big is it, and what is a recent paper about it?"*
 ## Deploying the landing page (maintainers only)
 
 The marketing site in `site/` deploys to `https://skyquery-mcp.pages.dev` via Cloudflare
-Pages. Automatic deploys on push need two GitHub repo secrets:
-
-1. `CLOUDFLARE_API_TOKEN`, a token with the **Cloudflare Pages: Edit** permission
-   (create it at https://dash.cloudflare.com/profile/api-tokens).
-2. `CLOUDFLARE_ACCOUNT_ID`, your account id.
-
-Add them under the repo's *Settings → Secrets and variables → Actions*. The
-`.github/workflows/deploy-pages.yml` workflow then publishes `site/` on every push
-that touches it. To deploy manually:
+Pages using Wrangler. There is no CI deploy job and no repository secret to manage: a
+maintainer publishes with a single command after logging in once with
+`npx wrangler login`.
 
 ```bash
-npx wrangler pages deploy site --project-name=skyquery-mcp
+npx wrangler pages deploy site --project-name=skyquery-mcp --branch=main
 ```
+
+Wrangler authenticates through your local Cloudflare login, so nothing leaves your
+machine and no long-lived API token is stored anywhere.
