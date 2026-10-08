@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Privacy policy · SkyQuery</title>
+  <meta name="description" content="SkyQuery is built so that there is very little to say here, and that is deliberate. This page covers both the SkyQuery software and this website." />
+  <link rel="canonical" href="https://skyquery-mcp.pages.dev/privacy" />
+  <link rel="alternate" type="text/markdown" href="/privacy.md" />
+  <meta name="theme-color" content="#06080D" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F8F6F1" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SkyQuery" />
+  <meta property="og:url" content="https://skyquery-mcp.pages.dev/privacy" />
+  <meta property="og:title" content="Privacy policy · SkyQuery" />
+  <meta property="og:description" content="SkyQuery is built so that there is very little to say here, and that is deliberate. This page covers both the SkyQuery software and this website." />
+  <meta property="og:image" content="https://skyquery-mcp.pages.dev/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy policy",
+    "description": "SkyQuery is built so that there is very little to say here, and that is deliberate. This page covers both the SkyQuery software and this website.",
+    "url": "https://skyquery-mcp.pages.dev/privacy",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "SkyQuery",
+      "url": "https://skyquery-mcp.pages.dev/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="/" aria-label="SkyQuery home">
+        <span class="brand__mark" aria-hidden="true">✦</span>
+        <span class="brand__name">SkyQuery</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="/#how">How it works</a>
+        <a href="/#capabilities">Capabilities</a>
+        <a href="/developers">Developers</a>
+        <a href="/#install">Install</a>
+      </nav>
+      <div class="nav__actions">
+        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+          <span class="theme-sun" aria-hidden="true">☀</span>
+          <span class="theme-moon" aria-hidden="true">☾</span>
+        </button>
+        <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
+          <span aria-hidden="true">★</span> GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="page wrap">
+    <article class="prose">
+<h1>Privacy policy</h1>
+<p>SkyQuery is built so that there is very little to say here, and that is deliberate. This page covers both the SkyQuery software and this website.</p>
+<h2 id="the-skyquery-software">The SkyQuery software</h2>
+<ul>
+<li><strong>No telemetry.</strong> SkyQuery does not collect usage statistics, crash reports, or analytics of any kind, and it never phones home.</li>
+<li><strong>Local data stays local.</strong> The on-disk cache, downloaded files, and the SQLite query and citation log live in a directory on your own machine (by default <code>~/.local/share/skyquery</code>, or the path in <code>SKYQUERY_HOME</code>). You can delete it at any time.</li>
+<li><strong>Keys stay in your keychain.</strong> Optional API keys for NASA ADS and NASA Open APIs are stored only in your operating system's keychain through <code>keyring</code>. They are never written to a file, a log line, or the repository.</li>
+<li><strong>Third-party services.</strong> In live mode, SkyQuery sends your queries directly from your computer to the public services you ask about, such as SIMBAD, JPL Horizons, VizieR, Gaia, NASA ADS, arXiv, and MAST. Those requests are governed by each provider's own privacy policy. In the default replay mode, no network requests are made at all.</li>
+</ul>
+<h2 id="this-website">This website</h2>
+<ul>
+<li><strong>No cookies, no tracking.</strong> This site sets no cookies and runs no analytics or advertising scripts.</li>
+<li><strong>Local preference only.</strong> If you switch between light and dark themes, that choice is saved in your browser's local storage and never leaves your device.</li>
+<li><strong>Hosting.</strong> The site is served by Cloudflare Pages. Cloudflare processes standard request data such as IP addresses to deliver and protect the site, as described in the <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare privacy policy</a>.</li>
+<li><strong>Fonts.</strong> Typefaces load from Google Fonts, which receives a standard request from your browser.</li>
+</ul>
+<h2 id="contact">Contact</h2>
+<p>Questions about privacy can go to the maintainer through the channels on the <a href="/contact">contact page</a>.</p>
+<p>Last updated: 2026-10-08.</p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="/">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <span class="brand__name">SkyQuery</span>
+        </a>
+        <p>The sky, queryable. Your questions, real data, one conversation.</p>
+        <p class="footer__meta">MIT · v0.1.0 · Runs on your machine</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h2>Product</h2>
+          <a href="/#capabilities">Capabilities</a>
+          <a href="/#sources">Sources</a>
+          <a href="/#install">Install</a>
+        </div>
+        <div>
+          <h2>Developers</h2>
+          <a href="/developers">Developer portal</a>
+          <a href="/openapi.json">OpenAPI spec</a>
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+        </div>
+        <div>
+          <h2>Community</h2>
+          <a href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/issues" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/discussions" target="_blank" rel="noopener">Discussions</a>
+        </div>
+        <div>
+          <h2>Support it</h2>
+          <a class="coffee" href="https://buymeacoffee.com/winnerkarthik" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap footer__credit">
+      Built with astropy, astroquery, and astroplan. Data courtesy of SIMBAD (CDS), JPL, VizieR,
+      Gaia/ESA, MAST/STScI, and NASA ADS. SkyQuery is independent and unaffiliated with any of them.
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

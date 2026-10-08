@@ -1,0 +1,452 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SkyQuery metadata API",
+    "version": "1.0.0",
+    "summary": "Public, read-only metadata about the SkyQuery astronomy MCP server.",
+    "description": "SkyQuery is a free, open-source, local MCP server and CLI that lets AI assistants query real astronomy data (SIMBAD, JPL Horizons, VizieR, Gaia, ADS, arXiv) with units and citations attached. This API describes its MCP tools and upstream data sources so agents can decide whether and how to use it. It needs no authentication. Astronomy queries themselves run locally: install with `uv tool install git+https://github.com/KarthikSubramanian07/skyquery` and run `skyquery-mcp`.",
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    },
+    "contact": {
+      "name": "SkyQuery maintainers",
+      "url": "https://github.com/KarthikSubramanian07/skyquery/issues"
+    }
+  },
+  "externalDocs": {
+    "description": "SkyQuery developer portal",
+    "url": "https://skyquery-mcp.pages.dev/developers"
+  },
+  "servers": [
+    {
+      "url": "https://skyquery-mcp.pages.dev",
+      "description": "Production"
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "tools",
+      "description": "The MCP tools SkyQuery exposes."
+    },
+    {
+      "name": "meta",
+      "description": "API index, data sources, and status."
+    }
+  ],
+  "paths": {
+    "/api/v1": {
+      "get": {
+        "operationId": "getApiIndex",
+        "summary": "API index",
+        "description": "Entry point listing every endpoint and related resource.",
+        "tags": [
+          "meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "API index with links.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndex"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools": {
+      "get": {
+        "operationId": "listTools",
+        "summary": "List MCP tools",
+        "description": "Every MCP tool the SkyQuery server registers, with its description and input JSON Schema. Use this to plan calls to a local SkyQuery MCP server.",
+        "tags": [
+          "tools"
+        ],
+        "responses": {
+          "200": {
+            "description": "The tool catalog.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools/{name}": {
+      "get": {
+        "operationId": "getTool",
+        "summary": "Get one MCP tool",
+        "description": "One MCP tool by name, with its full input JSON Schema.",
+        "tags": [
+          "tools"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "description": "The MCP tool name.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "apophis_demo",
+                "astronomy_picture_of_the_day",
+                "cone_search",
+                "convert_frame",
+                "convert_units",
+                "crossmatch",
+                "distance_from_parallax",
+                "get_ephemeris",
+                "get_small_body",
+                "object_dossier",
+                "resolve_object",
+                "search_literature",
+                "session_citations"
+              ]
+            },
+            "example": "get_ephemeris"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested tool.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tool"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No tool with that name. The error lists valid names.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sources": {
+      "get": {
+        "operationId": "listSources",
+        "summary": "List upstream data sources",
+        "description": "The public astronomy services SkyQuery wraps, and whether each needs a free API key.",
+        "tags": [
+          "meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "The data sources.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SourceList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "operationId": "getStatus",
+        "summary": "Service status",
+        "description": "Health of this API and the current SkyQuery release.",
+        "tags": [
+          "meta"
+        ],
+        "responses": {
+          "200": {
+            "description": "Status and version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiIndex": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "description",
+          "links"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "links": {
+            "type": "object",
+            "description": "Absolute URLs of related resources.",
+            "additionalProperties": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "Tool": {
+        "type": "object",
+        "required": [
+          "name",
+          "summary",
+          "description",
+          "inputSchema",
+          "returns",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP tool name."
+          },
+          "summary": {
+            "type": "string",
+            "description": "One-line summary."
+          },
+          "description": {
+            "type": "string",
+            "description": "Full guidance."
+          },
+          "inputSchema": {
+            "type": "object",
+            "description": "JSON Schema for the tool's arguments."
+          },
+          "returns": {
+            "type": "string",
+            "description": "Result model name."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "ToolList": {
+        "type": "object",
+        "required": [
+          "version",
+          "count",
+          "tools"
+        ],
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "SkyQuery release."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tool"
+            }
+          }
+        }
+      },
+      "Source": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "provider",
+          "provides",
+          "key_required",
+          "url"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "provides": {
+            "type": "string"
+          },
+          "key_required": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "SourceList": {
+        "type": "object",
+        "required": [
+          "count",
+          "sources"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            }
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "install",
+          "repository"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          },
+          "version": {
+            "type": "string"
+          },
+          "install": {
+            "type": "string",
+            "description": "Install command."
+          },
+          "repository": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "status",
+              "code",
+              "message",
+              "hint",
+              "docs"
+            ],
+            "properties": {
+              "status": {
+                "type": "integer"
+              },
+              "code": {
+                "type": "string",
+                "enum": [
+                  "not_found",
+                  "tool_not_found",
+                  "method_not_allowed",
+                  "internal_error"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "hint": {
+                "type": "string",
+                "description": "How to recover."
+              },
+              "docs": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

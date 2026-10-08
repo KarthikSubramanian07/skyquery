@@ -1,0 +1,85 @@
+{
+  "count": 10,
+  "sources": [
+    {
+      "id": "simbad",
+      "name": "SIMBAD",
+      "provider": "CDS, Strasbourg",
+      "provides": "Object identifiers, coordinates, and metadata",
+      "key_required": false,
+      "url": "https://simbad.cds.unistra.fr/"
+    },
+    {
+      "id": "horizons",
+      "name": "JPL Horizons",
+      "provider": "NASA JPL Solar System Dynamics",
+      "provides": "Solar-system ephemerides and state vectors",
+      "key_required": false,
+      "url": "https://ssd.jpl.nasa.gov/horizons/"
+    },
+    {
+      "id": "sbdb",
+      "name": "JPL Small-Body Database",
+      "provider": "NASA JPL Solar System Dynamics",
+      "provides": "Small-body physical and orbital parameters",
+      "key_required": false,
+      "url": "https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html"
+    },
+    {
+      "id": "gaia",
+      "name": "Gaia DR3",
+      "provider": "ESA",
+      "provides": "Astrometry and photometry",
+      "key_required": false,
+      "url": "https://gea.esac.esa.int/archive/"
+    },
+    {
+      "id": "vizier",
+      "name": "VizieR",
+      "provider": "CDS, Strasbourg",
+      "provides": "Thousands of published catalogs, including 2MASS and SDSS",
+      "key_required": false,
+      "url": "https://vizier.cds.unistra.fr/"
+    },
+    {
+      "id": "ned",
+      "name": "NED",
+      "provider": "NASA/IPAC",
+      "provides": "Extragalactic object data",
+      "key_required": false,
+      "url": "https://ned.ipac.caltech.edu/"
+    },
+    {
+      "id": "ads",
+      "name": "NASA ADS",
+      "provider": "NASA / Smithsonian Astrophysical Observatory",
+      "provides": "The astronomy literature",
+      "key_required": true,
+      "url": "https://ui.adsabs.harvard.edu/"
+    },
+    {
+      "id": "arxiv",
+      "name": "arXiv",
+      "provider": "Cornell University",
+      "provides": "astro-ph preprints",
+      "key_required": false,
+      "url": "https://arxiv.org/"
+    },
+    {
+      "id": "mast",
+      "name": "MAST",
+      "provider": "STScI",
+      "provides": "HST, JWST, TESS, and Kepler data products",
+      "key_required": false,
+      "url": "https://mast.stsci.edu/"
+    },
+    {
+      "id": "nasa",
+      "name": "NASA Open APIs",
+      "provider": "NASA",
+      "provides": "Astronomy Picture of the Day",
+      "key_required": false,
+      "url": "https://api.nasa.gov/"
+    }
+  ]
+}

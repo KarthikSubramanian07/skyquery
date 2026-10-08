@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>About SkyQuery</title>
+  <meta name="description" content="SkyQuery is a free, open-source Model Context Protocol (MCP) server and command-line tool for astronomy. It gives AI assistants and the people who use them..." />
+  <link rel="canonical" href="https://skyquery-mcp.pages.dev/about" />
+  <link rel="alternate" type="text/markdown" href="/about.md" />
+  <meta name="theme-color" content="#06080D" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F8F6F1" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SkyQuery" />
+  <meta property="og:url" content="https://skyquery-mcp.pages.dev/about" />
+  <meta property="og:title" content="About SkyQuery" />
+  <meta property="og:description" content="SkyQuery is a free, open-source Model Context Protocol (MCP) server and command-line tool for astronomy. It gives AI assistants and the people who use them..." />
+  <meta property="og:image" content="https://skyquery-mcp.pages.dev/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About SkyQuery",
+    "description": "SkyQuery is a free, open-source Model Context Protocol (MCP) server and command-line tool for astronomy. It gives AI assistants and the people who use them...",
+    "url": "https://skyquery-mcp.pages.dev/about",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "SkyQuery",
+      "url": "https://skyquery-mcp.pages.dev/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="/" aria-label="SkyQuery home">
+        <span class="brand__mark" aria-hidden="true">✦</span>
+        <span class="brand__name">SkyQuery</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="/#how">How it works</a>
+        <a href="/#capabilities">Capabilities</a>
+        <a href="/developers">Developers</a>
+        <a href="/#install">Install</a>
+      </nav>
+      <div class="nav__actions">
+        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+          <span class="theme-sun" aria-hidden="true">☀</span>
+          <span class="theme-moon" aria-hidden="true">☾</span>
+        </button>
+        <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
+          <span aria-hidden="true">★</span> GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="page wrap">
+    <article class="prose">
+<h1>About SkyQuery</h1>
+<p>SkyQuery is a free, open-source Model Context Protocol (MCP) server and command-line tool for astronomy. It gives AI assistants and the people who use them a single, honest interface to the public astronomy services that working astronomers rely on every day: SIMBAD, JPL Horizons, the JPL Small-Body Database, VizieR, Gaia, NASA ADS, arXiv, and MAST.</p>
+<h2 id="why-it-exists">Why it exists</h2>
+<p>The data is public and abundant, but the interfaces are fragmented and unforgiving. To answer one ordinary question, such as where comet Apophis will be tonight, how big it is, and what the latest paper about it says, you touch three different services, each with its own units, coordinate conventions, and query syntax. Ask a language model directly and it may invent an ephemeris that looks right and is wrong.</p>
+<p>SkyQuery is the missing layer. It hands the assistant results that are typed, unit-tagged, and carry their provenance, so the model can reason over real data instead of guessing.</p>
+<h2 id="what-it-is-and-what-it-is-not">What it is, and what it is not</h2>
+<ul>
+<li><strong>It is local-first.</strong> SkyQuery runs on your own computer. There is no SkyQuery server, no account, and no telemetry. Your queries go directly from your machine to the public services.</li>
+<li><strong>It is open source.</strong> The full source is on <a href="https://github.com/KarthikSubramanian07/skyquery">GitHub</a> under the MIT license.</li>
+<li><strong>It builds on astroquery.</strong> SkyQuery is a normalization and MCP layer on top of <a href="https://astroquery.readthedocs.io/">astroquery</a> and <a href="https://www.astropy.org/">astropy</a>, and credits them loudly.</li>
+<li><strong>It is independent.</strong> SkyQuery is not affiliated with, or endorsed by, NASA, JPL, CDS/Strasbourg, STScI, ESA, the Astropy project, or the unrelated JHU catalog tool of a similar name.</li>
+<li><strong>It is not a hosted data service.</strong> It does not proxy, resell, or store astronomy data on a server.</li>
+</ul>
+<h2 id="who-builds-it">Who builds it</h2>
+<p>SkyQuery is created and maintained by <a href="https://github.com/KarthikSubramanian07">Karthik Subramanian</a> as an independent open-source project. Contributions, bug reports, and ideas are welcome through <a href="https://github.com/KarthikSubramanian07/skyquery/issues">GitHub issues</a> and <a href="https://github.com/KarthikSubramanian07/skyquery/discussions">discussions</a>.</p>
+<h2 id="acknowledgments">Acknowledgments</h2>
+<p>SkyQuery depends on publicly funded infrastructure. Data courtesy of SIMBAD (CDS, Strasbourg), the JPL Solar System Dynamics group, VizieR, ESA Gaia, MAST at STScI, NASA ADS, and arXiv. Every SkyQuery result carries the acknowledgment each service asks you to cite, and the <code>session_citations</code> tool collects them for you.</p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="/">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <span class="brand__name">SkyQuery</span>
+        </a>
+        <p>The sky, queryable. Your questions, real data, one conversation.</p>
+        <p class="footer__meta">MIT · v0.1.0 · Runs on your machine</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h2>Product</h2>
+          <a href="/#capabilities">Capabilities</a>
+          <a href="/#sources">Sources</a>
+          <a href="/#install">Install</a>
+        </div>
+        <div>
+          <h2>Developers</h2>
+          <a href="/developers">Developer portal</a>
+          <a href="/openapi.json">OpenAPI spec</a>
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+        </div>
+        <div>
+          <h2>Community</h2>
+          <a href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/issues" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/discussions" target="_blank" rel="noopener">Discussions</a>
+        </div>
+        <div>
+          <h2>Support it</h2>
+          <a class="coffee" href="https://buymeacoffee.com/winnerkarthik" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap footer__credit">
+      Built with astropy, astroquery, and astroplan. Data courtesy of SIMBAD (CDS), JPL, VizieR,
+      Gaia/ESA, MAST/STScI, and NASA ADS. SkyQuery is independent and unaffiliated with any of them.
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
