@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import html
+import inspect
 import json
 import re
 import sys
@@ -149,7 +150,8 @@ def load_tools() -> list[dict[str, Any]]:
     tools = asyncio.run(server.mcp.list_tools())
     catalog: list[dict[str, Any]] = []
     for tool in sorted(tools, key=lambda t: t.name):
-        description = textwrap.dedent(tool.description or "").strip()
+        # cleandoc, not dedent: Python 3.13 pre-strips docstring indentation, 3.12 does not.
+        description = inspect.cleandoc(tool.description or "")
         output = tool.output_schema or {}
         catalog.append(
             {
