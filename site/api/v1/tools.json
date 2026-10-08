@@ -1,0 +1,330 @@
+{
+  "version": "0.1.0",
+  "count": 13,
+  "tools": [
+    {
+      "name": "apophis_demo",
+      "summary": "The headline demo: asteroid Apophis size, its 2029 close approach, a paper.",
+      "description": "The headline demo: asteroid Apophis size, its 2029 close approach, a paper.\n\nAnswers \"where is Apophis, how big is it, and what is the latest paper\" in one\ncall, combining SBDB, Horizons, and the literature with full provenance.",
+      "inputSchema": {
+        "properties": {
+          "with_paper": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "returns": "ApophisReport",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/apophis_demo"
+    },
+    {
+      "name": "astronomy_picture_of_the_day",
+      "summary": "Fetch NASA's Astronomy Picture of the Day (APOD) for a date, or today.",
+      "description": "Fetch NASA's Astronomy Picture of the Day (APOD) for a date, or today.\n\nWorks with the public DEMO_KEY out of the box; configure a free NASA key via\n`skyquery login` for higher rate limits.",
+      "inputSchema": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "returns": "AstronomyPicture",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/astronomy_picture_of_the_day"
+    },
+    {
+      "name": "cone_search",
+      "summary": "Return catalog sources within a radius of a position.",
+      "description": "Return catalog sources within a radius of a position.\n\n``center`` may be an object name (resolved via SIMBAD) or \"RA DEC\" in degrees.\n``catalog`` is \"gaia\" for Gaia DR3, or a VizieR catalog id such as \"II/246\"\nfor 2MASS. Every column is unit-tagged. Radius is capped at 5 degrees and\n``row_limit`` at 100 to protect free public services.",
+      "inputSchema": {
+        "properties": {
+          "center": {
+            "type": "string"
+          },
+          "radius_deg": {
+            "default": 0.05,
+            "exclusiveMinimum": 0,
+            "maximum": 5.0,
+            "type": "number"
+          },
+          "catalog": {
+            "default": "gaia",
+            "type": "string"
+          },
+          "row_limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "center"
+        ],
+        "type": "object"
+      },
+      "returns": "CatalogTable",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/cone_search"
+    },
+    {
+      "name": "convert_frame",
+      "summary": "Transform coordinates between reference frames (ICRS, FK5, FK4, Galactic).",
+      "description": "Transform coordinates between reference frames (ICRS, FK5, FK4, Galactic).\n\nUses astropy's tested transforms, never hand-rolled trigonometry. Returns the\nposition in the target frame with the frame explicitly labeled.",
+      "inputSchema": {
+        "properties": {
+          "ra_deg": {
+            "type": "number"
+          },
+          "dec_deg": {
+            "type": "number"
+          },
+          "from_frame": {
+            "default": "icrs",
+            "enum": [
+              "icrs",
+              "fk5",
+              "fk4",
+              "galactic"
+            ],
+            "type": "string"
+          },
+          "to_frame": {
+            "default": "galactic",
+            "enum": [
+              "icrs",
+              "fk5",
+              "fk4",
+              "galactic"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ra_deg",
+          "dec_deg"
+        ],
+        "type": "object"
+      },
+      "returns": "SkyPosition",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/convert_frame"
+    },
+    {
+      "name": "convert_units",
+      "summary": "Convert a value between physical units with astropy's tested conversions.",
+      "description": "Convert a value between physical units with astropy's tested conversions.\n\nExample: convert a parallax in mas, a distance in pc to ly, a velocity in km/s.\nReturns the converted value tagged with its new unit. Rejects unit mismatches.",
+      "inputSchema": {
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "from_unit": {
+            "type": "string"
+          },
+          "to_unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "from_unit",
+          "to_unit"
+        ],
+        "type": "object"
+      },
+      "returns": "Measurement",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/convert_units"
+    },
+    {
+      "name": "crossmatch",
+      "summary": "Match a list of target names to their nearest source in a catalog.",
+      "description": "Match a list of target names to their nearest source in a catalog.\n\nResolves each name to a position, then finds the nearest catalog source within\n``tolerance_arcsec``. Reports both matches (with separation) and any targets\nwith no source inside the tolerance. At most 50 targets per call.",
+      "inputSchema": {
+        "properties": {
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "catalog": {
+            "default": "gaia",
+            "type": "string"
+          },
+          "tolerance_arcsec": {
+            "default": 5.0,
+            "exclusiveMinimum": 0,
+            "maximum": 60.0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "targets"
+        ],
+        "type": "object"
+      },
+      "returns": "CrossMatchOutput",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/crossmatch"
+    },
+    {
+      "name": "distance_from_parallax",
+      "summary": "Convert a parallax in milliarcseconds to a distance in parsecs.",
+      "description": "Convert a parallax in milliarcseconds to a distance in parsecs.\n\nRejects non-positive parallaxes, for which distance is undefined, rather than\nreturning a nonsense number.",
+      "inputSchema": {
+        "properties": {
+          "parallax_mas": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "parallax_mas"
+        ],
+        "type": "object"
+      },
+      "returns": "Measurement",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/distance_from_parallax"
+    },
+    {
+      "name": "get_ephemeris",
+      "summary": "Compute a solar-system body's apparent ephemeris from JPL Horizons.",
+      "description": "Compute a solar-system body's apparent ephemeris from JPL Horizons.\n\nReturns a time series of ICRS position, distance (delta, in AU), range rate,\nand V magnitude for a body such as \"99942 Apophis\", \"Ceres\", or \"C/2023 A3\".\n``observer_location`` is a Horizons code; \"500@399\" is geocentric. This is the\ncapability the other astronomy MCP servers skip, so prefer it for \"where is\n<body> on <date>\" questions. Windows that would exceed ~2000 samples are rejected.",
+      "inputSchema": {
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "start": {
+            "description": "UT start date, YYYY-MM-DD or YYYY-MM-DD HH:MM",
+            "type": "string"
+          },
+          "stop": {
+            "description": "UT stop date, YYYY-MM-DD or YYYY-MM-DD HH:MM",
+            "type": "string"
+          },
+          "step": {
+            "default": "1h",
+            "description": "Sampling step such as 1h, 30m, or 1d",
+            "type": "string"
+          },
+          "observer_location": {
+            "default": "500@399",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "start",
+          "stop"
+        ],
+        "type": "object"
+      },
+      "returns": "Ephemeris",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/get_ephemeris"
+    },
+    {
+      "name": "get_small_body",
+      "summary": "Look up an asteroid or comet's physical and orbital parameters (JPL SBDB).",
+      "description": "Look up an asteroid or comet's physical and orbital parameters (JPL SBDB).\n\nReturns diameter, absolute magnitude, albedo, rotation period, and osculating\norbital elements, each unit-tagged. Pair with get_ephemeris to answer \"how big\nis it and where is it\".",
+      "inputSchema": {
+        "properties": {
+          "designation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "designation"
+        ],
+        "type": "object"
+      },
+      "returns": "SmallBody",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/get_small_body"
+    },
+    {
+      "name": "object_dossier",
+      "summary": "Resolve an object and, optionally, attach recent papers about it.",
+      "description": "Resolve an object and, optionally, attach recent papers about it.\n\nCombines object intelligence with a literature lookup in one call. Use when a\nuser asks \"tell me about X\" and wants both the numbers and the references.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "with_papers": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "returns": "ObjectDossier",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/object_dossier"
+    },
+    {
+      "name": "resolve_object",
+      "summary": "Resolve an astronomical object name or identifier to normalized data.",
+      "description": "Resolve an astronomical object name or identifier to normalized data.\n\nReturns canonical coordinates (ICRS degrees), object type, cross-identifiers,\nand measured properties (parallax, proper motion, redshift, magnitudes), each\ncarrying its unit and a provenance record you can cite. Try SIMBAD-style\nnames like \"Vega\", \"M31\", \"Betelgeuse\", or catalog ids. This is usually the\nfirst call: downstream tools take the returned RA/Dec.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "returns": "Object",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/resolve_object"
+    },
+    {
+      "name": "search_literature",
+      "summary": "Search the astronomy literature (NASA ADS, or arXiv when no ADS key is set).",
+      "description": "Search the astronomy literature (NASA ADS, or arXiv when no ADS key is set).\n\nReturns normalized paper records with title, authors, year, bibcode, and a\nresolvable URL. ADS needs a free token configured via `skyquery login`; without\none, SkyQuery falls back to arXiv automatically. ``rows`` is capped at 50.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "rows": {
+            "default": 5,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "prefer": {
+            "default": "ads",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "returns": "search_literatureOutput",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/search_literature"
+    },
+    {
+      "name": "session_citations",
+      "summary": "Return the deduplicated acknowledgments for every source used this session.",
+      "description": "Return the deduplicated acknowledgments for every source used this session.\n\nCall this at the end of a research conversation to get a ready-to-paste\ncitations block honoring each service's acknowledgment policy.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "returns": "session_citationsOutput",
+      "url": "https://skyquery-mcp.pages.dev/api/v1/tools/session_citations"
+    }
+  ]
+}

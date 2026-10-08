@@ -1,0 +1,6 @@
+{
+  "status": "ok",
+  "version": "0.1.0",
+  "install": "uv tool install git+https://github.com/KarthikSubramanian07/skyquery",
+  "repository": "https://github.com/KarthikSubramanian07/skyquery"
+}

@@ -42,10 +42,10 @@ jobs:
           uv pip install -e ".[dev]"
 
       - name: Ruff lint
-        run: uv run ruff check src tests
+        run: uv run ruff check src tests scripts/build_site.py
 
       - name: Ruff format check
-        run: uv run ruff format --check src tests
+        run: uv run ruff format --check src tests scripts/build_site.py
 
       - name: Pyright typecheck
         run: uv run pyright
@@ -57,3 +57,27 @@ jobs:
           SKYQUERY_REPLAY: "1"
           SKYQUERY_OFFLINE: "1"
         run: uv run pytest -q --cov=skyquery --cov-report=term-missing
+
+      - name: Site artifacts are current
+        run: uv run python scripts/build_site.py --check
+
+  site:
+    name: Site edge functions and agent endpoints
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Edge unit tests
+        run: npm test
+
+      # Serve the site on the real Pages runtime (workerd) and probe every
+      # agent-facing endpoint: content negotiation, 404s, the JSON API.
+      - name: End-to-end smoke test on local Pages runtime
+        run: |
+          npx --yes wrangler@4 pages dev site --port 8788 --compatibility-date=2026-10-01 > wrangler.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8788/robots.txt && break; sleep 2; done
+          bash scripts/smoke_site.sh http://localhost:8788 || (cat wrangler.log; exit 1)
