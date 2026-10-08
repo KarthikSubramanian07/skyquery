@@ -6,11 +6,15 @@
   <title>SkyQuery — The sky, queryable. Real astronomy data for AI assistants</title>
   <meta name="description" content="SkyQuery is an open-source local MCP server that lets your AI assistant query real astronomy data: object lookups, asteroid ephemerides, catalog cross-matches, and the literature, all normalized with citable provenance. Runs entirely on your machine." />
   <link rel="canonical" href="https://skyquery-mcp.pages.dev/" />
+  <link rel="alternate" type="text/markdown" href="/index.md" />
+  <link rel="service-desc" type="application/openapi+json" href="/openapi.json" />
+  <link rel="help" type="text/plain" href="/llms.txt" />
   <meta name="theme-color" content="#06080D" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#F8F6F1" media="(prefers-color-scheme: light)" />
   <meta name="color-scheme" content="dark light" />
 
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SkyQuery" />
   <meta property="og:url" content="https://skyquery-mcp.pages.dev/" />
   <meta property="og:title" content="SkyQuery — The sky, queryable." />
   <meta property="og:description" content="An open-source local MCP server that lets your AI assistant query real astronomy data, normalized with citable provenance." />
@@ -40,11 +44,34 @@
         "name": "SkyQuery",
         "url": "https://skyquery-mcp.pages.dev/",
         "description": "The sky, queryable. A local open-source MCP server for real astronomy data with citable provenance.",
-        "publisher": {
+        "publisher": { "@id": "https://skyquery-mcp.pages.dev/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://skyquery-mcp.pages.dev/#organization",
+        "name": "SkyQuery",
+        "url": "https://skyquery-mcp.pages.dev/",
+        "logo": "https://skyquery-mcp.pages.dev/og.png",
+        "description": "Independent open-source project building SkyQuery, a local MCP server and CLI for real astronomy data.",
+        "founder": {
           "@type": "Person",
           "name": "Karthik Subramanian",
           "url": "https://github.com/KarthikSubramanian07"
-        }
+        },
+        "sameAs": ["https://github.com/KarthikSubramanian07/skyquery"],
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "url": "https://github.com/KarthikSubramanian07/skyquery/issues",
+            "availableLanguage": "English"
+          },
+          {
+            "@type": "ContactPoint",
+            "contactType": "security",
+            "url": "https://github.com/KarthikSubramanian07/skyquery/blob/main/SECURITY.md"
+          }
+        ]
       },
       {
         "@type": "SoftwareApplication",
@@ -62,6 +89,8 @@
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "programmingLanguage": "Python",
         "codeRepository": "https://github.com/KarthikSubramanian07/skyquery",
+        "softwareHelp": { "@type": "WebPage", "url": "https://skyquery-mcp.pages.dev/developers" },
+        "author": { "@id": "https://skyquery-mcp.pages.dev/#organization" },
         "image": "https://skyquery-mcp.pages.dev/og.png"
       }
     ]
@@ -83,6 +112,7 @@
         <a href="#how">How it works</a>
         <a href="#capabilities">Capabilities</a>
         <a href="#sources">Sources</a>
+        <a href="/developers">Developers</a>
         <a href="#install">Install</a>
       </nav>
       <div class="nav__actions">
@@ -100,7 +130,7 @@
   <main id="top">
     <!-- HERO -->
     <section class="hero wrap">
-      <p class="eyebrow">Local MCP server · Real astronomy data</p>
+      <p class="eyebrow">SkyQuery · Local astronomy MCP server</p>
       <h1 class="hero__title">The sky, queryable.</h1>
       <p class="hero__sub">
         Point your AI assistant at the real sky. Object lookups, asteroid ephemerides,
@@ -288,6 +318,7 @@
               <button class="copy" type="button" data-copy='{&#10;  "mcpServers": {&#10;    "skyquery": {&#10;      "command": "skyquery-mcp"&#10;    }&#10;  }&#10;}' aria-label="Copy config">Copy</button>
             </div>
             <p class="req">Optional free keys unlock more: <code>skyquery login ads</code> and <code>skyquery login nasa</code>. They go straight to your OS keychain, never a file.</p>
+            <p class="req">Building an integration? The <a href="/developers">developer portal</a> has the full tool reference, the CLI, and the <a href="/openapi.json">metadata API</a>.</p>
           </div>
         </div>
       </div>
@@ -312,7 +343,7 @@
   <footer class="footer">
     <div class="wrap footer__inner">
       <div class="footer__brand">
-        <a class="brand" href="#top">
+        <a class="brand" href="/">
           <span class="brand__mark" aria-hidden="true">✦</span>
           <span class="brand__name">SkyQuery</span>
         </a>
@@ -321,19 +352,31 @@
       </div>
       <div class="footer__cols">
         <div>
-          <h4>Product</h4>
-          <a href="#capabilities">Capabilities</a>
-          <a href="#sources">Sources</a>
-          <a href="#install">Install</a>
+          <h2>Product</h2>
+          <a href="/#capabilities">Capabilities</a>
+          <a href="/#sources">Sources</a>
+          <a href="/#install">Install</a>
         </div>
         <div>
-          <h4>Community</h4>
+          <h2>Developers</h2>
+          <a href="/developers">Developer portal</a>
+          <a href="/openapi.json">OpenAPI spec</a>
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+        </div>
+        <div>
+          <h2>Community</h2>
           <a href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">GitHub</a>
           <a href="https://github.com/KarthikSubramanian07/skyquery/issues" target="_blank" rel="noopener">Issues</a>
           <a href="https://github.com/KarthikSubramanian07/skyquery/discussions" target="_blank" rel="noopener">Discussions</a>
         </div>
         <div>
-          <h4>Support it</h4>
+          <h2>Support it</h2>
           <a class="coffee" href="https://buymeacoffee.com/winnerkarthik" target="_blank" rel="noopener">☕ Buy me a coffee</a>
         </div>
       </div>

@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# Agent guide: https://skyquery-mcp.pages.dev/llms.txt
+# API contract: https://skyquery-mcp.pages.dev/openapi.json
+
 Sitemap: https://skyquery-mcp.pages.dev/sitemap.xml

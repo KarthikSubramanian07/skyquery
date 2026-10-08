@@ -1,0 +1,47 @@
+# SkyQuery
+
+> SkyQuery is a free, open-source, local MCP server and CLI for astronomy. It gives an AI agent typed, unit-tagged, citable answers from real public services (SIMBAD, JPL Horizons, JPL SBDB, VizieR, Gaia DR3, NASA ADS, arXiv, MAST, NASA APOD) instead of numbers the model would otherwise guess. It runs on the user's machine; there is no hosted query service and no account.
+
+## When to use SkyQuery
+
+Reach for SkyQuery when a user's question needs real astronomical data rather than recall:
+
+- **Where is a solar-system body at a given time?** Asteroid, comet, or planet positions, distances, and magnitudes from JPL Horizons. Call `get_ephemeris`.
+- **What is this object?** Resolve a star, galaxy, or nebula name ("Vega", "M31", "Betelgeuse") to ICRS coordinates, type, cross-identifiers, parallax, and magnitudes. Call `resolve_object`, or `object_dossier` to add papers.
+- **How big is this asteroid, and what is its orbit?** Diameter, albedo, rotation period, and orbital elements from JPL SBDB. Call `get_small_body`.
+- **What sources are near this position?** Cone search Gaia DR3 or any VizieR catalog, or cross-match a list of targets. Call `cone_search` or `crossmatch`.
+- **What papers exist about this?** Search NASA ADS (with a free key) or arXiv. Call `search_literature`.
+- **Unit or frame math that must be exact.** Parallax to distance, pc to light-years, ICRS to Galactic. Call `distance_from_parallax`, `convert_units`, or `convert_frame`.
+- **Citations for a research conversation.** Call `session_citations` at the end.
+
+Do not use SkyQuery for: telescope control, proprietary or embargoed data, image processing, astrology, or general space news. It is not affiliated with NASA, JPL, CDS, STScI, ESA, or the Astropy project.
+
+## How an agent should call it
+
+1. Install once: `uv tool install git+https://github.com/KarthikSubramanian07/skyquery` (Python 3.12+).
+2. Register the stdio MCP server `skyquery-mcp` with the MCP client. Set `SKYQUERY_REPLAY=0` in its environment for live data; the default is an offline sandbox of recorded fixtures.
+3. Chain tools: resolve a name to a position, the position to a catalog, the object to its papers. Every result carries a `provenance` record; quote it when you report numbers.
+4. Without MCP, use the CLI: `skyquery --json --live resolve Vega` prints machine-readable JSON.
+5. Limits protect free public services: cone radius at most 5 degrees, at most 100 catalog rows, 50 cross-match targets, about 2000 ephemeris samples per call.
+
+## Docs
+
+- [Developer portal](https://skyquery-mcp.pages.dev/developers): quickstart, sandbox, auth, full MCP tool reference, CLI, metadata API
+- [Developer portal (Markdown)](https://skyquery-mcp.pages.dev/developers.md): the same page as Markdown
+- [Homepage (Markdown)](https://skyquery-mcp.pages.dev/index.md): what SkyQuery is, capabilities, data sources
+- [README](https://github.com/KarthikSubramanian07/skyquery/blob/main/README.md): architecture and design notes
+- [Setup guide](https://github.com/KarthikSubramanian07/skyquery/blob/main/SETUP.md): install, keys, live mode, MCP client config
+
+## API
+
+- [OpenAPI spec](https://skyquery-mcp.pages.dev/openapi.json): OpenAPI 3.1 contract for the public metadata API
+- [Tool catalog](https://skyquery-mcp.pages.dev/api/v1/tools): every MCP tool with its input JSON Schema
+- [Data sources](https://skyquery-mcp.pages.dev/api/v1/sources): upstream services and which need a free key
+- [API catalog](https://skyquery-mcp.pages.dev/.well-known/api-catalog): RFC 9727 linkset
+
+## Optional
+
+- [About](https://skyquery-mcp.pages.dev/about): who builds SkyQuery and why
+- [Contact](https://skyquery-mcp.pages.dev/contact): issues, discussions, and security reports
+- [Privacy](https://skyquery-mcp.pages.dev/privacy): no telemetry; what stays on your machine
+- [Source code](https://github.com/KarthikSubramanian07/skyquery): MIT licensed
