@@ -1,6 +1,6 @@
 # Contact SkyQuery
 
-SkyQuery is an independent open-source project, so every channel below is public and handled by the maintainer, Karthik Subramanian. Pick the one that fits what you need.
+SkyQuery is an independent open-source project, so every channel below is public and handled by the maintainer, Karthik Subramanian. Pick the one that fits what you need. The project is based in Berkeley, California.
 
 ## Bugs and feature requests
 

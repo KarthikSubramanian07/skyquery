@@ -310,6 +310,11 @@ def test_homepage_jsonld() -> None:
     org = by_type["Organization"]
     assert org["url"] == f"{SITE_URL}/"
     assert org["contactPoint"]
+    address = org["address"]
+    assert address["@type"] == "PostalAddress"
+    assert address["addressLocality"] == "Berkeley"
+    assert address["addressRegion"] == "CA"
+    assert address["addressCountry"] == "US"
     for point in org["contactPoint"]:
         assert point["@type"] == "ContactPoint"
         assert point["contactType"]
