@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/styles.css",
+    "/app.js",
+    "/favicon.svg",
+    "/og.png",
+    "/og.svg",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/llms.txt",
+    "/openapi.json",
+    "/.well-known/*"
+  ]
+}

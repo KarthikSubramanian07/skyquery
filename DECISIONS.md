@@ -128,3 +128,16 @@ and verify that nothing exfiltrates.
 Proprietary or embargoed data, telescope control, simulation or theory engines, and
 any hosted or multi-tenant deployment. Those either break the local-only trust model
 or are out of scope on purpose.
+
+## The website speaks to agents, but stays a brochure
+
+The landing site serves agents as well as people: every page has a Markdown twin
+negotiated on `Accept: text/markdown`, unknown paths return real 404s (Markdown for
+agents), and `llms.txt`, `openapi.json`, and an RFC 9727 API catalog describe the
+project. The `/api/v1` REST API is deliberately **metadata only**: the MCP tool
+catalog (introspected from the server, so it cannot drift), data sources, and
+status. It never runs astronomy queries. A hosted query API would turn SkyQuery
+into the multi-tenant service this project chose not to be, put load on free public
+services from a shared IP, and break the "nothing leaves your machine" promise.
+Pages Functions do the negotiation because Cloudflare Pages cannot vary static
+responses on request headers by configuration alone.

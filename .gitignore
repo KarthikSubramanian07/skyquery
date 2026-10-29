@@ -40,3 +40,7 @@ skyquery.sqlite3
 node_modules/
 site/.wrangler/
 uv.lock
+
+# Cloudflare Wrangler local state / Node
+.wrangler/
+node_modules/
