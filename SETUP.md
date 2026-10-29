@@ -103,5 +103,28 @@ maintainer publishes with a single command after logging in once with
 npx wrangler pages deploy site --project-name=skyquery-mcp --branch=main
 ```
 
+Run it from the **repository root**: Wrangler bundles the `functions/` directory
+(Markdown content negotiation, real 404s, and the JSON metadata API) only when it
+sits next to the deployed `site/` folder.
+
+### Agent-facing files
+
+Most of what agents read is generated, so it cannot drift from the code:
+
+```bash
+uv run python scripts/build_site.py          # regenerate after changing a tool or page
+uv run python scripts/build_site.py --check  # CI fails if output is stale
+npm test                                     # edge function unit tests (Node 22+)
+npm run dev                                  # serve site + functions locally on :8788
+bash scripts/smoke_site.sh                   # end-to-end checks (pass a URL for prod)
+```
+
+| Source | Generates / serves |
+| --- | --- |
+| MCP server tool registry | `site/api/v1/tools.json`, `site/openapi.json`, the tool reference in `site/developers.md` |
+| `site/{about,contact,privacy,developers,404}.md` | the matching `.html` pages, and the Markdown served for `Accept: text/markdown` |
+| `site/index.md` (hand-written) | the homepage's Markdown twin; keep it in step with `site/index.html` |
+| `functions/` + `edge/agent.js` | content negotiation, Markdown 404s, `/api/v1/*` JSON and JSON errors |
+
 Wrangler authenticates through your local Cloudflare login, so nothing leaves your
 machine and no long-lived API token is stored anywhere.

@@ -1,0 +1,13 @@
+{
+  "name": "SkyQuery metadata API",
+  "version": "v1",
+  "description": "Public, read-only metadata about SkyQuery's MCP tools and data sources. Astronomy queries run locally through the SkyQuery MCP server or CLI.",
+  "links": {
+    "tools": "https://skyquery-mcp.pages.dev/api/v1/tools",
+    "sources": "https://skyquery-mcp.pages.dev/api/v1/sources",
+    "status": "https://skyquery-mcp.pages.dev/api/v1/status",
+    "openapi": "https://skyquery-mcp.pages.dev/openapi.json",
+    "docs": "https://skyquery-mcp.pages.dev/developers",
+    "llms": "https://skyquery-mcp.pages.dev/llms.txt"
+  }
+}

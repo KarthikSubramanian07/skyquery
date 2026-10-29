@@ -1,0 +1,45 @@
+name: Release
+
+# Publishes the `skyquery` CLI and `skyquery-mcp` server to PyPI when a version
+# tag (v*) is pushed. Uses PyPI trusted publishing (OIDC), so no API token is
+# stored in the repository. One-time setup: add this repository and workflow as
+# a trusted publisher for the `skyquery-mcp` project on pypi.org, and create a
+# `pypi` environment in the repository settings.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - name: Verify tag matches the package version
+        run: |
+          version=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != v$version"; exit 1; }
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

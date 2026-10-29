@@ -1,0 +1,11 @@
+{
+  "name": "skyquery-site",
+  "private": true,
+  "description": "Edge functions and checks for the SkyQuery landing site (Cloudflare Pages).",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/edge/*.test.js",
+    "dev": "npx wrangler@4 pages dev site --port 8788",
+    "smoke": "bash scripts/smoke_site.sh"
+  }
+}
