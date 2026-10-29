@@ -51,6 +51,8 @@ dev = [
     "ruff>=0.5",
     "pyright>=1.1.360",
     "pre-commit>=3.7",
+    "markdown-it-py>=3.0",
+    "openapi-spec-validator>=0.7",
 ]
 
 [project.urls]
@@ -83,9 +85,11 @@ ignore = ["PLR0913", "PLR2004", "PLR0911", "PLR0912", "PLR0915", "PLC0415"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["PLR2004", "N802"]
+# HTML and CSS templates are long single lines by nature.
+"scripts/build_site.py" = ["E501"]
 
 [tool.pyright]
-include = ["src", "tests"]
+include = ["src", "tests", "scripts"]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
 # astropy, astroquery, and the mcp 2.0 SDK ship incomplete inline type

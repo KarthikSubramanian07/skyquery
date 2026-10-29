@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SkyQuery developer portal</title>
+  <meta name="description" content="Everything you need to drive SkyQuery from code, a terminal, or an AI agent: a five-minute quickstart, the offline sandbox, the full MCP tool reference, the..." />
+  <link rel="canonical" href="https://skyquery-mcp.pages.dev/developers" />
+  <link rel="alternate" type="text/markdown" href="/developers.md" />
+  <meta name="theme-color" content="#06080D" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F8F6F1" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="SkyQuery" />
+  <meta property="og:url" content="https://skyquery-mcp.pages.dev/developers" />
+  <meta property="og:title" content="SkyQuery developer portal" />
+  <meta property="og:description" content="Everything you need to drive SkyQuery from code, a terminal, or an AI agent: a five-minute quickstart, the offline sandbox, the full MCP tool reference, the..." />
+  <meta property="og:image" content="https://skyquery-mcp.pages.dev/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "SkyQuery developer portal",
+    "description": "Everything you need to drive SkyQuery from code, a terminal, or an AI agent: a five-minute quickstart, the offline sandbox, the full MCP tool reference, the...",
+    "url": "https://skyquery-mcp.pages.dev/developers",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "SkyQuery",
+      "url": "https://skyquery-mcp.pages.dev/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="/" aria-label="SkyQuery home">
+        <span class="brand__mark" aria-hidden="true">✦</span>
+        <span class="brand__name">SkyQuery</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary">
+        <a href="/#how">How it works</a>
+        <a href="/#capabilities">Capabilities</a>
+        <a href="/developers" aria-current="page">Developers</a>
+        <a href="/#install">Install</a>
+      </nav>
+      <div class="nav__actions">
+        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+          <span class="theme-sun" aria-hidden="true">☀</span>
+          <span class="theme-moon" aria-hidden="true">☾</span>
+        </button>
+        <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
+          <span aria-hidden="true">★</span> GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" class="page wrap">
+    <article class="prose">
+<h1>SkyQuery developer portal</h1>
+<p>Everything you need to drive SkyQuery from code, a terminal, or an AI agent: a five-minute quickstart, the offline sandbox, the full MCP tool reference, the CLI, and the public metadata API.</p>
+<h2 id="quickstart">Quickstart</h2>
+<p>SkyQuery requires Python 3.12 or newer.</p>
+<pre><code class="language-bash"># Install the CLI and the MCP server from source
+uv tool install git+https://github.com/KarthikSubramanian07/skyquery
+
+# Prove it works, offline, with no keys
+skyquery demo
+skyquery resolve Vega
+skyquery --json ephemeris &quot;99942 Apophis&quot; --start 2029-04-13 --stop 2029-04-14
+</code></pre>
+<p>Then register the MCP server with your client. For Claude Desktop, edit <code>claude_desktop_config.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;skyquery&quot;: {
+      &quot;command&quot;: &quot;skyquery-mcp&quot;,
+      &quot;env&quot;: { &quot;SKYQUERY_REPLAY&quot;: &quot;0&quot; }
+    }
+  }
+}
+</code></pre>
+<p>Omit the <code>env</code> block to stay in offline replay mode.</p>
+<h2 id="sandbox-offline-replay-mode">Sandbox: offline replay mode</h2>
+<p>SkyQuery ships with recorded fixtures and runs against them by default, so every example on this page works with no network and no keys. This is the sandbox: deterministic answers, zero load on public services. Leave it with <code>--live</code> on the CLI or <code>SKYQUERY_REPLAY=0</code> in the environment.</p>
+<h2 id="authentication-and-api-keys">Authentication and API keys</h2>
+<p>You do not need an account or a SkyQuery key. The metadata API on this site is public and unauthenticated. Two upstream services take an optional free key, which SkyQuery stores only in your OS keychain:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Command</th>
+<th>Where to get a key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NASA ADS</td>
+<td><code>skyquery login ads</code></td>
+<td>https://ui.adsabs.harvard.edu/user/settings/token</td>
+</tr>
+<tr>
+<td>NASA Open APIs</td>
+<td><code>skyquery login nasa</code></td>
+<td>https://api.nasa.gov/ (or keep <code>DEMO_KEY</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Remove a key with <code>skyquery logout &lt;service&gt;</code> and check what is set with <code>skyquery status</code>.</p>
+<h2 id="mcp-tool-reference">MCP tool reference</h2>
+<p>Every tool returns a typed, unit-tagged result with a provenance record. The same list, with full JSON Schemas for each tool's input, is available at <a href="https://skyquery-mcp.pages.dev/api/v1/tools"><code>/api/v1/tools</code></a>.</p>
+<h3 id="apophis-demo"><code>apophis_demo</code></h3>
+<p>The headline demo: asteroid Apophis size, its 2029 close approach, a paper.</p>
+<p>Answers &quot;where is Apophis, how big is it, and what is the latest paper&quot; in one call, combining SBDB, Horizons, and the literature with full provenance.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>with_paper</code></td>
+<td>boolean</td>
+<td>no</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>ApophisReport</code>.</p>
+<h3 id="astronomy-picture-of-the-day"><code>astronomy_picture_of_the_day</code></h3>
+<p>Fetch NASA's Astronomy Picture of the Day (APOD) for a date, or today.</p>
+<p>Works with the public DEMO_KEY out of the box; configure a free NASA key via <code>skyquery login</code> for higher rate limits.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>date</code></td>
+<td>string or null</td>
+<td>no</td>
+<td><code>null</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>AstronomyPicture</code>.</p>
+<h3 id="cone-search"><code>cone_search</code></h3>
+<p>Return catalog sources within a radius of a position.</p>
+<p><code>center</code> may be an object name (resolved via SIMBAD) or &quot;RA DEC&quot; in degrees. <code>catalog</code> is &quot;gaia&quot; for Gaia DR3, or a VizieR catalog id such as &quot;II/246&quot; for 2MASS. Every column is unit-tagged. Radius is capped at 5 degrees and <code>row_limit</code> at 100 to protect free public services.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>center</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>radius_deg</code></td>
+<td>number</td>
+<td>no</td>
+<td><code>0.05</code></td>
+<td>&gt; 0, &lt;= 5.0</td>
+</tr>
+<tr>
+<td><code>catalog</code></td>
+<td>string</td>
+<td>no</td>
+<td><code>&quot;gaia&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>row_limit</code></td>
+<td>integer</td>
+<td>no</td>
+<td><code>20</code></td>
+<td>&gt;= 1, &lt;= 100</td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>CatalogTable</code>.</p>
+<h3 id="convert-frame"><code>convert_frame</code></h3>
+<p>Transform coordinates between reference frames (ICRS, FK5, FK4, Galactic).</p>
+<p>Uses astropy's tested transforms, never hand-rolled trigonometry. Returns the position in the target frame with the frame explicitly labeled.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ra_deg</code></td>
+<td>number</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>dec_deg</code></td>
+<td>number</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>from_frame</code></td>
+<td><code>&quot;icrs&quot;</code> | <code>&quot;fk5&quot;</code> | <code>&quot;fk4&quot;</code> | <code>&quot;galactic&quot;</code></td>
+<td>no</td>
+<td><code>&quot;icrs&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>to_frame</code></td>
+<td><code>&quot;icrs&quot;</code> | <code>&quot;fk5&quot;</code> | <code>&quot;fk4&quot;</code> | <code>&quot;galactic&quot;</code></td>
+<td>no</td>
+<td><code>&quot;galactic&quot;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>SkyPosition</code>.</p>
+<h3 id="convert-units"><code>convert_units</code></h3>
+<p>Convert a value between physical units with astropy's tested conversions.</p>
+<p>Example: convert a parallax in mas, a distance in pc to ly, a velocity in km/s. Returns the converted value tagged with its new unit. Rejects unit mismatches.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value</code></td>
+<td>number</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>from_unit</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>to_unit</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>Measurement</code>.</p>
+<h3 id="crossmatch"><code>crossmatch</code></h3>
+<p>Match a list of target names to their nearest source in a catalog.</p>
+<p>Resolves each name to a position, then finds the nearest catalog source within <code>tolerance_arcsec</code>. Reports both matches (with separation) and any targets with no source inside the tolerance. At most 50 targets per call.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>targets</code></td>
+<td>array of string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>catalog</code></td>
+<td>string</td>
+<td>no</td>
+<td><code>&quot;gaia&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>tolerance_arcsec</code></td>
+<td>number</td>
+<td>no</td>
+<td><code>5.0</code></td>
+<td>&gt; 0, &lt;= 60.0</td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>CrossMatchOutput</code>.</p>
+<h3 id="distance-from-parallax"><code>distance_from_parallax</code></h3>
+<p>Convert a parallax in milliarcseconds to a distance in parsecs.</p>
+<p>Rejects non-positive parallaxes, for which distance is undefined, rather than returning a nonsense number.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>parallax_mas</code></td>
+<td>number</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>Measurement</code>.</p>
+<h3 id="get-ephemeris"><code>get_ephemeris</code></h3>
+<p>Compute a solar-system body's apparent ephemeris from JPL Horizons.</p>
+<p>Returns a time series of ICRS position, distance (delta, in AU), range rate, and V magnitude for a body such as &quot;99942 Apophis&quot;, &quot;Ceres&quot;, or &quot;C/2023 A3&quot;. <code>observer_location</code> is a Horizons code; &quot;500@399&quot; is geocentric. This is the capability the other astronomy MCP servers skip, so prefer it for &quot;where is &lt;body&gt; on &lt;date&gt;&quot; questions. Windows that would exceed ~2000 samples are rejected.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td>UT start date, YYYY-MM-DD or YYYY-MM-DD HH:MM</td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td>UT stop date, YYYY-MM-DD or YYYY-MM-DD HH:MM</td>
+</tr>
+<tr>
+<td><code>step</code></td>
+<td>string</td>
+<td>no</td>
+<td><code>&quot;1h&quot;</code></td>
+<td>Sampling step such as 1h, 30m, or 1d</td>
+</tr>
+<tr>
+<td><code>observer_location</code></td>
+<td>string</td>
+<td>no</td>
+<td><code>&quot;500@399&quot;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>Ephemeris</code>.</p>
+<h3 id="get-small-body"><code>get_small_body</code></h3>
+<p>Look up an asteroid or comet's physical and orbital parameters (JPL SBDB).</p>
+<p>Returns diameter, absolute magnitude, albedo, rotation period, and osculating orbital elements, each unit-tagged. Pair with get_ephemeris to answer &quot;how big is it and where is it&quot;.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>designation</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>SmallBody</code>.</p>
+<h3 id="object-dossier"><code>object_dossier</code></h3>
+<p>Resolve an object and, optionally, attach recent papers about it.</p>
+<p>Combines object intelligence with a literature lookup in one call. Use when a user asks &quot;tell me about X&quot; and wants both the numbers and the references.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>with_papers</code></td>
+<td>boolean</td>
+<td>no</td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>ObjectDossier</code>.</p>
+<h3 id="resolve-object"><code>resolve_object</code></h3>
+<p>Resolve an astronomical object name or identifier to normalized data.</p>
+<p>Returns canonical coordinates (ICRS degrees), object type, cross-identifiers, and measured properties (parallax, proper motion, redshift, magnitudes), each carrying its unit and a provenance record you can cite. Try SIMBAD-style names like &quot;Vega&quot;, &quot;M31&quot;, &quot;Betelgeuse&quot;, or catalog ids. This is usually the first call: downstream tools take the returned RA/Dec.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>Object</code>.</p>
+<h3 id="search-literature"><code>search_literature</code></h3>
+<p>Search the astronomy literature (NASA ADS, or arXiv when no ADS key is set).</p>
+<p>Returns normalized paper records with title, authors, year, bibcode, and a resolvable URL. ADS needs a free token configured via <code>skyquery login</code>; without one, SkyQuery falls back to arXiv automatically. <code>rows</code> is capped at 50.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td>string</td>
+<td>yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><code>rows</code></td>
+<td>integer</td>
+<td>no</td>
+<td><code>5</code></td>
+<td>&gt;= 1, &lt;= 50</td>
+</tr>
+<tr>
+<td><code>prefer</code></td>
+<td>string</td>
+<td>no</td>
+<td><code>&quot;ads&quot;</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Returns: <code>search_literatureOutput</code>.</p>
+<h3 id="session-citations"><code>session_citations</code></h3>
+<p>Return the deduplicated acknowledgments for every source used this session.</p>
+<p>Call this at the end of a research conversation to get a ready-to-paste citations block honoring each service's acknowledgment policy.</p>
+<p>Takes no parameters.</p>
+<p>Returns: <code>session_citationsOutput</code>.</p>
+<h2 id="cli-reference">CLI reference</h2>
+<p>Add <code>--json</code> before any command for machine-readable output, and <code>--live</code> to query live services.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skyquery demo</code></td>
+<td>Apophis size, 2029 close approach, and a paper</td>
+</tr>
+<tr>
+<td><code>skyquery resolve &lt;name&gt;</code></td>
+<td>Resolve an object name to coordinates and measured properties</td>
+</tr>
+<tr>
+<td><code>skyquery ephemeris &lt;target&gt; --start --stop --step</code></td>
+<td>JPL Horizons ephemeris for a solar-system body</td>
+</tr>
+<tr>
+<td><code>skyquery small-body &lt;designation&gt;</code></td>
+<td>Asteroid or comet physical and orbital parameters</td>
+</tr>
+<tr>
+<td><code>skyquery cone &lt;center&gt; --radius --catalog --rows</code></td>
+<td>Cone search Gaia or a VizieR catalog</td>
+</tr>
+<tr>
+<td><code>skyquery literature &lt;query&gt; --rows --prefer</code></td>
+<td>Search ADS or arXiv</td>
+</tr>
+<tr>
+<td><code>skyquery convert &lt;value&gt; &lt;from&gt; &lt;to&gt;</code></td>
+<td>Unit conversion with astropy</td>
+</tr>
+<tr>
+<td><code>skyquery frame &lt;ra&gt; &lt;dec&gt; --from --to</code></td>
+<td>Coordinate frame transform</td>
+</tr>
+<tr>
+<td><code>skyquery apod --date</code></td>
+<td>NASA Astronomy Picture of the Day</td>
+</tr>
+<tr>
+<td><code>skyquery setup</code> / <code>status</code> / <code>cite</code></td>
+<td>Local directories, configuration, citations</td>
+</tr>
+<tr>
+<td><code>skyquery login &lt;service&gt;</code> / <code>logout &lt;service&gt;</code></td>
+<td>Manage optional keys in the OS keychain</td>
+</tr>
+</tbody>
+</table>
+<h2 id="metadata-api">Metadata API</h2>
+<p>A small, public, read-only REST API describes SkyQuery's tools and data sources so agents can decide whether to install it. It does not run astronomy queries; those run locally through the MCP server or CLI. The full contract is the <a href="https://skyquery-mcp.pages.dev/openapi.json">OpenAPI 3.1 spec</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Returns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/v1</code></td>
+<td>API index with links</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/tools</code></td>
+<td>Every MCP tool with its input JSON Schema</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/tools/{name}</code></td>
+<td>One MCP tool</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/sources</code></td>
+<td>Upstream data sources and whether they need a key</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/v1/status</code></td>
+<td>Service status and version</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">curl -s https://skyquery-mcp.pages.dev/api/v1/tools/get_ephemeris
+</code></pre>
+<h3 id="errors">Errors</h3>
+<p>Errors are JSON with a stable machine-readable code and a hint:</p>
+<pre><code class="language-json">{
+  &quot;error&quot;: {
+    &quot;status&quot;: 404,
+    &quot;code&quot;: &quot;tool_not_found&quot;,
+    &quot;message&quot;: &quot;No MCP tool named 'get_ephemerides'.&quot;,
+    &quot;hint&quot;: &quot;List valid tool names at /api/v1/tools.&quot;,
+    &quot;docs&quot;: &quot;https://skyquery-mcp.pages.dev/developers#metadata-api&quot;
+  }
+}
+</code></pre>
+<p>Codes: <code>not_found</code>, <code>tool_not_found</code>, <code>method_not_allowed</code>, <code>internal_error</code>. Responses are cacheable, CORS-enabled, and need no authentication.</p>
+<h2 id="machine-readable-resources">Machine-readable resources</h2>
+<ul>
+<li><a href="https://skyquery-mcp.pages.dev/llms.txt">llms.txt</a>: when and how an agent should use SkyQuery</li>
+<li><a href="https://skyquery-mcp.pages.dev/openapi.json">openapi.json</a>: OpenAPI 3.1 description of the metadata API</li>
+<li><a href="https://skyquery-mcp.pages.dev/.well-known/api-catalog">/.well-known/api-catalog</a>: RFC 9727 API catalog</li>
+<li>Markdown versions of every page: send <code>Accept: text/markdown</code>, or append <code>.md</code> (for example <a href="https://skyquery-mcp.pages.dev/developers.md">/developers.md</a>)</li>
+<li><a href="https://github.com/KarthikSubramanian07/skyquery">Source code and issues</a></li>
+</ul>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <a class="brand" href="/">
+          <span class="brand__mark" aria-hidden="true">✦</span>
+          <span class="brand__name">SkyQuery</span>
+        </a>
+        <p>The sky, queryable. Your questions, real data, one conversation.</p>
+        <p class="footer__meta">MIT · v0.1.0 · Runs on your machine</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h2>Product</h2>
+          <a href="/#capabilities">Capabilities</a>
+          <a href="/#sources">Sources</a>
+          <a href="/#install">Install</a>
+        </div>
+        <div>
+          <h2>Developers</h2>
+          <a href="/developers">Developer portal</a>
+          <a href="/openapi.json">OpenAPI spec</a>
+          <a href="/llms.txt">llms.txt</a>
+        </div>
+        <div>
+          <h2>Project</h2>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/privacy">Privacy</a>
+        </div>
+        <div>
+          <h2>Community</h2>
+          <a href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/issues" target="_blank" rel="noopener">Issues</a>
+          <a href="https://github.com/KarthikSubramanian07/skyquery/discussions" target="_blank" rel="noopener">Discussions</a>
+        </div>
+        <div>
+          <h2>Support it</h2>
+          <a class="coffee" href="https://buymeacoffee.com/winnerkarthik" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap footer__credit">
+      Built with astropy, astroquery, and astroplan. Data courtesy of SIMBAD (CDS), JPL, VizieR,
+      Gaia/ESA, MAST/STScI, and NASA ADS. SkyQuery is independent and unaffiliated with any of them.
+    </div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
