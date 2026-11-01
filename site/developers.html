@@ -659,7 +659,7 @@ X-RateLimit-Reset: 42
 <p>The API version is in the path: <code>/api/v1</code>. The policy agents can rely on:</p>
 <ul>
 <li><strong>Within v1, changes are additive only.</strong> New endpoints, new optional fields, and new error codes may appear. Existing fields are never removed, renamed, or retyped.</li>
-<li><strong>Breaking changes ship as a new version</strong> (<code>/api/v2</code>), announced in the <a href="https://github.com/KarthikSubramanian07/skyquery/releases">changelog on GitHub</a> and in this section.</li>
+<li><strong>Breaking changes ship as a new version</strong> (<code>/api/v2</code>), announced in this section and in the <a href="https://github.com/KarthikSubramanian07/skyquery/commits/main">commit history on GitHub</a>.</li>
 <li><strong>An old version keeps working for at least 6 months</strong> after its successor ships. During that time its responses carry a <code>Deprecation</code> header (RFC 9745) with the date it was deprecated, a <code>Sunset</code> header (RFC 8594) with the date it stops answering, and a <code>Link: &lt;https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation&gt;; rel=&quot;deprecation&quot;</code> header pointing here.</li>
 <li><strong>After the sunset date</strong> the old paths return <code>410 Gone</code> with a JSON error naming the replacement.</li>
 </ul>

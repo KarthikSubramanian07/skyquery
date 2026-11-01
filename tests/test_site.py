@@ -407,3 +407,9 @@ def test_deprecation_policy_is_published() -> None:
     developers = (SITE / "developers.html").read_text(encoding="utf-8")
     assert 'id="versioning-and-deprecation"' in developers
     assert policy in (SITE / "llms.txt").read_text(encoding="utf-8")
+
+
+def test_docs_do_not_link_to_empty_releases_page() -> None:
+    """The repository publishes no GitHub releases, so docs must not link there."""
+    for path in [*SITE.glob("*.md"), SITE / "llms.txt"]:
+        assert "/skyquery/releases" not in path.read_text(encoding="utf-8"), path.name
