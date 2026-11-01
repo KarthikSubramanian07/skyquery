@@ -71,8 +71,8 @@ moment you install it.
 
 ```bash
 # 1. Install (pick one)
-uv tool install skyquery-mcp        # recommended
-pipx install skyquery-mcp
+uv tool install git+https://github.com/KarthikSubramanian07/skyquery   # recommended
+pipx install git+https://github.com/KarthikSubramanian07/skyquery
 
 # 2. Try it right now, offline, no keys
 skyquery demo
