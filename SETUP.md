@@ -6,8 +6,8 @@ SkyQuery works offline with no keys the moment it is installed.
 ## 1. Install
 
 ```bash
-uv tool install skyquery-mcp        # recommended
-# or: pipx install skyquery-mcp
+uv tool install git+https://github.com/KarthikSubramanian07/skyquery   # recommended
+# or: pipx install git+https://github.com/KarthikSubramanian07/skyquery
 # or, from a clone:  uv tool install .
 ```
 

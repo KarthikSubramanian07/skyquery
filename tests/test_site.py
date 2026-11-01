@@ -340,3 +340,18 @@ def test_render_markdown_adds_heading_ids_and_hides_markers() -> None:
     assert '<h2 id="metadata-api">' in out
     assert "tools:start" not in out
     assert "<h1>T</h1>" in out
+
+
+INSTALL_DOCS = [ROOT / "README.md", ROOT / "SETUP.md", *SITE.glob("*.html"), *SITE.glob("*.md")]
+GIT_INSTALL = "git+https://github.com/KarthikSubramanian07/skyquery"
+
+
+@pytest.mark.parametrize("path", INSTALL_DOCS, ids=lambda p: p.name)
+def test_install_commands_use_github_not_pypi(path: Path) -> None:
+    """SkyQuery is not on PyPI, so every install command must point at GitHub."""
+    text = path.read_text(encoding="utf-8")
+    commands = re.findall(r'(?:uv tool|pipx) install [^\s<"`]+', text)
+    for command in commands:
+        target = command.split()[-1]
+        assert target in (GIT_INSTALL, "."), f"{path.name}: {command!r} installs from PyPI"
+    assert "pypi.org" not in text.lower()
