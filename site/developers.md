@@ -294,7 +294,7 @@ Over the limit, the API returns `429` with a `rate_limited` error and a `Retry-A
 The API version is in the path: `/api/v1`. The policy agents can rely on:
 
 - **Within v1, changes are additive only.** New endpoints, new optional fields, and new error codes may appear. Existing fields are never removed, renamed, or retyped.
-- **Breaking changes ship as a new version** (`/api/v2`), announced in the [changelog on GitHub](https://github.com/KarthikSubramanian07/skyquery/releases) and in this section.
+- **Breaking changes ship as a new version** (`/api/v2`), announced in this section and in the [commit history on GitHub](https://github.com/KarthikSubramanian07/skyquery/commits/main).
 - **An old version keeps working for at least 6 months** after its successor ships. During that time its responses carry a `Deprecation` header (RFC 9745) with the date it was deprecated, a `Sunset` header (RFC 8594) with the date it stops answering, and a `Link: <https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation>; rel="deprecation"` header pointing here.
 - **After the sunset date** the old paths return `410 Gone` with a JSON error naming the replacement.
 
