@@ -22,7 +22,8 @@ Do not use SkyQuery for: telescope control, proprietary or embargoed data, image
 2. Register the stdio MCP server `skyquery-mcp` with the MCP client. Set `SKYQUERY_REPLAY=0` in its environment for live data; the default is an offline sandbox of recorded fixtures.
 3. Chain tools: resolve a name to a position, the position to a catalog, the object to its papers. Every result carries a `provenance` record; quote it when you report numbers.
 4. Without MCP, use the CLI: `skyquery --json --live resolve Vega` prints machine-readable JSON.
-5. Limits protect free public services: cone radius at most 5 degrees, at most 100 catalog rows, 50 cross-match targets, about 2000 ephemeris samples per call.
+5. The metadata API allows 600 requests per minute per client and reports usage in `RateLimit` headers; on a 429, wait `Retry-After` seconds.
+6. Limits protect free public services: cone radius at most 5 degrees, at most 100 catalog rows, 50 cross-match targets, about 2000 ephemeris samples per call.
 
 ## Docs
 
@@ -38,6 +39,8 @@ Do not use SkyQuery for: telescope control, proprietary or embargoed data, image
 - [Tool catalog](https://skyquery-mcp.pages.dev/api/v1/tools): every MCP tool with its input JSON Schema
 - [Data sources](https://skyquery-mcp.pages.dev/api/v1/sources): upstream services and which need a free key
 - [API catalog](https://skyquery-mcp.pages.dev/.well-known/api-catalog): RFC 9727 linkset
+- [MCP server card](https://skyquery-mcp.pages.dev/.well-known/mcp.json): how to install and launch the SkyQuery MCP server, with every tool's input schema
+- [Versioning and deprecation policy](https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation): additive changes within v1, at least 6 months' notice with Deprecation and Sunset headers before any version is retired
 
 ## Optional
 

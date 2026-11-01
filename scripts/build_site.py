@@ -249,24 +249,66 @@ def api_payloads(tools: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+# Mirrors RATE_LIMIT in edge/agent.js.
+RATE_LIMIT_QUOTA = 600
+RATE_LIMIT_WINDOW = 60
+POLICY_URL = f"{SITE_URL}/developers#versioning-and-deprecation"
+RATE_LIMIT_HEADERS = {
+    "RateLimit-Policy": 'Quota policy, for example `"default";q=600;w=60`.',
+    "RateLimit": 'Remaining quota and seconds until reset, for example `"default";r=599;t=42`.',
+    "X-RateLimit-Limit": "Requests allowed per window.",
+    "X-RateLimit-Remaining": "Requests left in the current window.",
+    "X-RateLimit-Reset": "Seconds until the window resets.",
+}
+
+
+def _headers(*extra: str) -> dict[str, Any]:
+    names = [*RATE_LIMIT_HEADERS, *extra]
+    return {name: {"$ref": f"#/components/headers/{name}"} for name in names}
+
+
 def _ok(description: str, ref: str) -> dict[str, Any]:
     return {
         "description": description,
+        "headers": _headers(),
         "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{ref}"}}},
     }
 
 
-def _err(description: str) -> dict[str, Any]:
+def _err(description: str, *extra_headers: str) -> dict[str, Any]:
     return {
         "description": description,
+        "headers": _headers(*extra_headers),
         "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}},
     }
 
 
+def _inline_refs(node: Any, root: dict[str, Any]) -> Any:
+    """Replace every local ``$ref`` with a copy of its target, recursively."""
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/"):
+            target: Any = root
+            for part in ref[2:].split("/"):
+                target = target[part]
+            return _inline_refs(target, root)
+        return {k: _inline_refs(v, root) for k, v in node.items()}
+    if isinstance(node, list):
+        return [_inline_refs(v, root) for v in node]
+    return node
+
+
 def openapi_spec(tools: list[dict[str, Any]]) -> dict[str, Any]:
     names = [t["name"] for t in tools]
-    common_errors = {"405": _err("Method not allowed. Only GET, HEAD, and OPTIONS.")}
-    return {
+    common_errors = {
+        "405": _err("Method not allowed. Only GET, HEAD, and OPTIONS.", "Allow"),
+        "429": _err(
+            f"Rate limited: more than {RATE_LIMIT_QUOTA} requests in {RATE_LIMIT_WINDOW} "
+            "seconds from one client. Wait for Retry-After seconds.",
+            "Retry-After",
+        ),
+    }
+    spec = {
         "openapi": "3.1.0",
         "info": {
             "title": "SkyQuery metadata API",
@@ -279,8 +321,17 @@ def openapi_spec(tools: list[dict[str, Any]]) -> dict[str, Any]:
                 "tools and upstream data sources so agents can decide whether and how to "
                 "use it. It needs no authentication. Astronomy queries themselves run "
                 "locally: install with `uv tool install git+" + REPO_URL + "` and run "
-                "`skyquery-mcp`."
+                "`skyquery-mcp`.\n\n"
+                f"Rate limits: {RATE_LIMIT_QUOTA} requests per {RATE_LIMIT_WINDOW} seconds per "
+                "client, reported in `RateLimit` and `X-RateLimit-*` headers; a 429 carries "
+                "`Retry-After`.\n\n"
+                "Versioning and deprecation: the version is in the path (`/api/v1`). Within "
+                "v1, changes are additive only. A breaking change ships as `/api/v2`; v1 then "
+                "keeps working for at least 6 months, and its responses carry `Deprecation` "
+                "(RFC 9745) and `Sunset` (RFC 8594) headers plus a `Link` with "
+                f'rel="deprecation" to the policy at {POLICY_URL}.'
             ),
+            "x-deprecation-policy": POLICY_URL,
             "license": {"name": "MIT", "identifier": "MIT"},
             "contact": {"name": "SkyQuery maintainers", "url": f"{REPO_URL}/issues"},
         },
@@ -363,6 +414,20 @@ def openapi_spec(tools: list[dict[str, Any]]) -> dict[str, Any]:
             },
         },
         "components": {
+            "headers": {
+                **{
+                    name: {"description": desc, "schema": {"type": "string"}}
+                    for name, desc in RATE_LIMIT_HEADERS.items()
+                },
+                "Retry-After": {
+                    "description": "Seconds to wait before retrying.",
+                    "schema": {"type": "integer", "minimum": 1},
+                },
+                "Allow": {
+                    "description": "Methods this API supports.",
+                    "schema": {"type": "string", "example": "GET, HEAD, OPTIONS"},
+                },
+            },
             "schemas": {
                 "ApiIndex": {
                     "type": "object",
@@ -450,6 +515,7 @@ def openapi_spec(tools: list[dict[str, Any]]) -> dict[str, Any]:
                                         "not_found",
                                         "tool_not_found",
                                         "method_not_allowed",
+                                        "rate_limited",
                                         "internal_error",
                                     ],
                                 },
@@ -460,8 +526,69 @@ def openapi_spec(tools: list[dict[str, Any]]) -> dict[str, Any]:
                         }
                     },
                 },
-            }
+            },
         },
+    }
+    # Inline every reference inside operations so each one is self-describing
+    # for function-calling clients; components stay for tools that prefer refs.
+    spec["paths"] = _inline_refs(spec["paths"], spec)
+    return spec
+
+
+def mcp_server_card(tools: list[dict[str, Any]]) -> dict[str, Any]:
+    """Static MCP server card for HTTP discovery (MCP server-card proposal, SEP-2127).
+
+    SkyQuery is a local stdio server, so the card says how to install and launch
+    it rather than pointing at a remote endpoint.
+    """
+    return {
+        "version": "1.0",
+        "protocolVersion": "2025-06-18",
+        "name": "io.github.KarthikSubramanian07/skyquery",
+        "title": "SkyQuery",
+        "description": (
+            "Local MCP server for real astronomy data: SIMBAD, JPL Horizons, JPL SBDB, "
+            "VizieR, Gaia DR3, NASA ADS, arXiv, MAST, and NASA APOD, with units and "
+            "citable provenance on every result."
+        ),
+        "serverInfo": {"name": "skyquery", "title": "SkyQuery", "version": __version__},
+        "websiteUrl": SITE_URL,
+        "documentationUrl": f"{SITE_URL}/developers",
+        "iconUrl": f"{SITE_URL}/favicon.svg",
+        "repository": {"url": REPO_URL, "source": "github"},
+        "license": "MIT",
+        "transport": {"type": "stdio", "command": "skyquery-mcp"},
+        "packages": [
+            {
+                "registryType": "git",
+                "identifier": REPO_URL,
+                "install": f"uv tool install git+{REPO_URL}",
+                "transport": {"type": "stdio"},
+                "runtimeHint": "skyquery-mcp",
+                "environmentVariables": [
+                    {
+                        "name": "SKYQUERY_REPLAY",
+                        "description": (
+                            "1 (default) serves recorded fixtures offline; 0 queries live services."
+                        ),
+                        "isRequired": False,
+                    },
+                    {
+                        "name": "ADS_DEV_KEY",
+                        "description": "Free NASA ADS token for literature search.",
+                        "isRequired": False,
+                        "isSecret": True,
+                    },
+                ],
+            }
+        ],
+        "remotes": [],
+        "authentication": {"required": False},
+        "capabilities": {"tools": {"listChanged": False}},
+        "tools": [
+            {"name": t["name"], "description": t["summary"], "inputSchema": t["inputSchema"]}
+            for t in tools
+        ],
     }
 
 
@@ -688,6 +815,9 @@ def build() -> dict[Path, str]:
         out[SITE_DIR / "api" / "v1" / f"{name}.json"] = _json(payload)
     out[SITE_DIR / "openapi.json"] = _json(openapi_spec(tools))
     out[SITE_DIR / ".well-known" / "api-catalog"] = _json(api_catalog())
+    card = _json(mcp_server_card(tools))
+    out[SITE_DIR / ".well-known" / "mcp.json"] = card
+    out[SITE_DIR / ".well-known" / "mcp" / "server-card.json"] = card
 
     dev_path = SITE_DIR / "developers.md"
     dev_source = TOOLS_BLOCK.sub(

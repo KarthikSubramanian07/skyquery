@@ -4,7 +4,8 @@
     "title": "SkyQuery metadata API",
     "version": "1.0.0",
     "summary": "Public, read-only metadata about the SkyQuery astronomy MCP server.",
-    "description": "SkyQuery is a free, open-source, local MCP server and CLI that lets AI assistants query real astronomy data (SIMBAD, JPL Horizons, VizieR, Gaia, ADS, arXiv) with units and citations attached. This API describes its MCP tools and upstream data sources so agents can decide whether and how to use it. It needs no authentication. Astronomy queries themselves run locally: install with `uv tool install git+https://github.com/KarthikSubramanian07/skyquery` and run `skyquery-mcp`.",
+    "description": "SkyQuery is a free, open-source, local MCP server and CLI that lets AI assistants query real astronomy data (SIMBAD, JPL Horizons, VizieR, Gaia, ADS, arXiv) with units and citations attached. This API describes its MCP tools and upstream data sources so agents can decide whether and how to use it. It needs no authentication. Astronomy queries themselves run locally: install with `uv tool install git+https://github.com/KarthikSubramanian07/skyquery` and run `skyquery-mcp`.\n\nRate limits: 600 requests per 60 seconds per client, reported in `RateLimit` and `X-RateLimit-*` headers; a 429 carries `Retry-After`.\n\nVersioning and deprecation: the version is in the path (`/api/v1`). Within v1, changes are additive only. A breaking change ships as `/api/v2`; v1 then keeps working for at least 6 months, and its responses carry `Deprecation` (RFC 9745) and `Sunset` (RFC 8594) headers plus a `Link` with rel=\"deprecation\" to the policy at https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation.",
+    "x-deprecation-policy": "https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation",
     "license": {
       "name": "MIT",
       "identifier": "MIT"
@@ -47,20 +48,247 @@
         "responses": {
           "200": {
             "description": "API index with links.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ApiIndex"
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "version",
+                    "description",
+                    "links"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "type": "object",
+                      "description": "Absolute URLs of related resources.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "405": {
             "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Allow": {
+                "description": "Methods this API supports.",
+                "schema": {
+                  "type": "string",
+                  "example": "GET, HEAD, OPTIONS"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: more than 600 requests in 60 seconds from one client. Wait for Retry-After seconds.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -79,20 +307,277 @@
         "responses": {
           "200": {
             "description": "The tool catalog.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ToolList"
+                  "type": "object",
+                  "required": [
+                    "version",
+                    "count",
+                    "tools"
+                  ],
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "description": "SkyQuery release."
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "tools": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "summary",
+                          "description",
+                          "inputSchema",
+                          "returns",
+                          "url"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "MCP tool name."
+                          },
+                          "summary": {
+                            "type": "string",
+                            "description": "One-line summary."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Full guidance."
+                          },
+                          "inputSchema": {
+                            "type": "object",
+                            "description": "JSON Schema for the tool's arguments."
+                          },
+                          "returns": {
+                            "type": "string",
+                            "description": "Result model name."
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "405": {
             "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Allow": {
+                "description": "Methods this API supports.",
+                "schema": {
+                  "type": "string",
+                  "example": "GET, HEAD, OPTIONS"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: more than 600 requests in 60 seconds from one client. Wait for Retry-After seconds.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -138,30 +623,339 @@
         "responses": {
           "200": {
             "description": "The requested tool.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tool"
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "summary",
+                    "description",
+                    "inputSchema",
+                    "returns",
+                    "url"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "MCP tool name."
+                    },
+                    "summary": {
+                      "type": "string",
+                      "description": "One-line summary."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Full guidance."
+                    },
+                    "inputSchema": {
+                      "type": "object",
+                      "description": "JSON Schema for the tool's arguments."
+                    },
+                    "returns": {
+                      "type": "string",
+                      "description": "Result model name."
+                    },
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
                 }
               }
             }
           },
           "404": {
             "description": "No tool with that name. The error lists valid names.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "405": {
             "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Allow": {
+                "description": "Methods this API supports.",
+                "schema": {
+                  "type": "string",
+                  "example": "GET, HEAD, OPTIONS"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: more than 600 requests in 60 seconds from one client. Wait for Retry-After seconds.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -180,20 +974,267 @@
         "responses": {
           "200": {
             "description": "The data sources.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SourceList"
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "sources"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "sources": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "provider",
+                          "provides",
+                          "key_required",
+                          "url"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "provides": {
+                            "type": "string"
+                          },
+                          "key_required": {
+                            "type": "boolean"
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           },
           "405": {
             "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Allow": {
+                "description": "Methods this API supports.",
+                "schema": {
+                  "type": "string",
+                  "example": "GET, HEAD, OPTIONS"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: more than 600 requests in 60 seconds from one client. Wait for Retry-After seconds.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -212,20 +1253,247 @@
         "responses": {
           "200": {
             "description": "Status and version.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Status"
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "version",
+                    "install",
+                    "repository"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "ok"
+                      ]
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "install": {
+                      "type": "string",
+                      "description": "Install command."
+                    },
+                    "repository": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
                 }
               }
             }
           },
           "405": {
             "description": "Method not allowed. Only GET, HEAD, and OPTIONS.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Allow": {
+                "description": "Methods this API supports.",
+                "schema": {
+                  "type": "string",
+                  "example": "GET, HEAD, OPTIONS"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited: more than 600 requests in 60 seconds from one client. Wait for Retry-After seconds.",
+            "headers": {
+              "RateLimit-Policy": {
+                "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit": {
+                "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Requests allowed per window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Requests left in the current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Reset": {
+                "description": "Seconds until the window resets.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying.",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "status",
+                        "code",
+                        "message",
+                        "hint",
+                        "docs"
+                      ],
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        },
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found",
+                            "tool_not_found",
+                            "method_not_allowed",
+                            "rate_limited",
+                            "internal_error"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "hint": {
+                          "type": "string",
+                          "description": "How to recover."
+                        },
+                        "docs": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -235,6 +1503,52 @@
     }
   },
   "components": {
+    "headers": {
+      "RateLimit-Policy": {
+        "description": "Quota policy, for example `\"default\";q=600;w=60`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "RateLimit": {
+        "description": "Remaining quota and seconds until reset, for example `\"default\";r=599;t=42`.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-RateLimit-Limit": {
+        "description": "Requests allowed per window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-RateLimit-Remaining": {
+        "description": "Requests left in the current window.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-RateLimit-Reset": {
+        "description": "Seconds until the window resets.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Retry-After": {
+        "description": "Seconds to wait before retrying.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "Allow": {
+        "description": "Methods this API supports.",
+        "schema": {
+          "type": "string",
+          "example": "GET, HEAD, OPTIONS"
+        }
+      }
+    },
     "schemas": {
       "ApiIndex": {
         "type": "object",
@@ -429,6 +1743,7 @@
                   "not_found",
                   "tool_not_found",
                   "method_not_allowed",
+                  "rate_limited",
                   "internal_error"
                 ]
               },

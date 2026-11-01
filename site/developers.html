@@ -645,12 +645,31 @@ skyquery --json ephemeris &quot;99942 Apophis&quot; --start 2029-04-13 --stop 20
   }
 }
 </code></pre>
-<p>Codes: <code>not_found</code>, <code>tool_not_found</code>, <code>method_not_allowed</code>, <code>internal_error</code>. Responses are cacheable, CORS-enabled, and need no authentication.</p>
+<p>Codes: <code>not_found</code>, <code>tool_not_found</code>, <code>method_not_allowed</code>, <code>rate_limited</code>, <code>internal_error</code>. Responses are cacheable, CORS-enabled, and need no authentication.</p>
+<h3 id="rate-limits">Rate limits</h3>
+<p>Each client may make 600 requests per 60 seconds. Every response reports where you stand, in the IETF <code>RateLimit</code> header format and the common <code>X-RateLimit-*</code> form:</p>
+<pre><code class="language-http">RateLimit-Policy: &quot;default&quot;;q=600;w=60
+RateLimit: &quot;default&quot;;r=599;t=42
+X-RateLimit-Limit: 600
+X-RateLimit-Remaining: 599
+X-RateLimit-Reset: 42
+</code></pre>
+<p>Over the limit, the API returns <code>429</code> with a <code>rate_limited</code> error and a <code>Retry-After</code> header giving the seconds to wait. The data changes only on release, so cache responses (they allow 5 minutes) instead of polling.</p>
+<h2 id="versioning-and-deprecation">Versioning and deprecation</h2>
+<p>The API version is in the path: <code>/api/v1</code>. The policy agents can rely on:</p>
+<ul>
+<li><strong>Within v1, changes are additive only.</strong> New endpoints, new optional fields, and new error codes may appear. Existing fields are never removed, renamed, or retyped.</li>
+<li><strong>Breaking changes ship as a new version</strong> (<code>/api/v2</code>), announced in the <a href="https://github.com/KarthikSubramanian07/skyquery/releases">changelog on GitHub</a> and in this section.</li>
+<li><strong>An old version keeps working for at least 6 months</strong> after its successor ships. During that time its responses carry a <code>Deprecation</code> header (RFC 9745) with the date it was deprecated, a <code>Sunset</code> header (RFC 8594) with the date it stops answering, and a <code>Link: &lt;https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation&gt;; rel=&quot;deprecation&quot;</code> header pointing here.</li>
+<li><strong>After the sunset date</strong> the old paths return <code>410 Gone</code> with a JSON error naming the replacement.</li>
+</ul>
+<p>No version is deprecated today.</p>
 <h2 id="machine-readable-resources">Machine-readable resources</h2>
 <ul>
 <li><a href="https://skyquery-mcp.pages.dev/llms.txt">llms.txt</a>: when and how an agent should use SkyQuery</li>
 <li><a href="https://skyquery-mcp.pages.dev/openapi.json">openapi.json</a>: OpenAPI 3.1 description of the metadata API</li>
 <li><a href="https://skyquery-mcp.pages.dev/.well-known/api-catalog">/.well-known/api-catalog</a>: RFC 9727 API catalog</li>
+<li><a href="https://skyquery-mcp.pages.dev/.well-known/mcp.json">/.well-known/mcp.json</a>: MCP server card (also at <a href="https://skyquery-mcp.pages.dev/.well-known/mcp/server-card.json">/.well-known/mcp/server-card.json</a>) with the install command, stdio launch command, and every tool's input schema</li>
 <li>Markdown versions of every page: send <code>Accept: text/markdown</code>, or append <code>.md</code> (for example <a href="https://skyquery-mcp.pages.dev/developers.md">/developers.md</a>)</li>
 <li><a href="https://github.com/KarthikSubramanian07/skyquery">Source code and issues</a></li>
 </ul>

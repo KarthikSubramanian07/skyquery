@@ -7,7 +7,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { parseAccept, prefersMarkdown, markdownPathFor, handlePage, handleApi } from "../../edge/agent.js";
+import { parseAccept, prefersMarkdown, markdownPathFor, handlePage, handleApi, RateLimiter } from "../../edge/agent.js";
 import { onRequest as middleware } from "../../functions/_middleware.js";
 
 const SITE = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "site");
@@ -225,5 +225,62 @@ describe("handleApi", () => {
     const res = await handleApi(req("/api/v1/tools"), broken);
     assert.equal(res.status, 500);
     assert.equal((await res.json()).error.code, "internal_error");
+  });
+});
+
+describe("rate limiting", () => {
+  test("API responses carry RateLimit and X-RateLimit headers", async () => {
+    const limiter = new RateLimiter({ quota: 5, windowSeconds: 60, policy: "default" });
+    const res = await handleApi(req("/api/v1/tools", { headers: { "CF-Connecting-IP": "203.0.113.1" } }), env, limiter);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("RateLimit-Policy"), '"default";q=5;w=60');
+    assert.match(res.headers.get("RateLimit"), /^"default";r=4;t=\d+$/);
+    assert.equal(res.headers.get("X-RateLimit-Limit"), "5");
+    assert.equal(res.headers.get("X-RateLimit-Remaining"), "4");
+    assert.match(res.headers.get("Access-Control-Expose-Headers"), /RateLimit/);
+    assert.equal(res.headers.get("Content-Type"), "application/json; charset=utf-8");
+  });
+
+  test("errors carry rate-limit headers too", async () => {
+    const limiter = new RateLimiter({ quota: 5, windowSeconds: 60, policy: "default" });
+    const res = await handleApi(req("/api/nope"), env, limiter);
+    assert.equal(res.status, 404);
+    assert.equal(res.headers.get("X-RateLimit-Remaining"), "4");
+  });
+
+  test("over the quota is a JSON 429 with Retry-After", async () => {
+    const limiter = new RateLimiter({ quota: 2, windowSeconds: 60, policy: "default" });
+    const ip = { headers: { "CF-Connecting-IP": "203.0.113.2" } };
+    await handleApi(req("/api/v1", ip), env, limiter);
+    await handleApi(req("/api/v1", ip), env, limiter);
+    const res = await handleApi(req("/api/v1", ip), env, limiter);
+    assert.equal(res.status, 429);
+    assert.ok(Number(res.headers.get("Retry-After")) >= 1);
+    assert.match(res.headers.get("RateLimit"), /r=0;/);
+    const { error } = await res.json();
+    assert.equal(error.code, "rate_limited");
+    assert.match(error.hint, /Retry-After/);
+    const other = await handleApi(req("/api/v1", { headers: { "CF-Connecting-IP": "203.0.113.3" } }), env, limiter);
+    assert.equal(other.status, 200, "other clients are unaffected");
+  });
+
+  test("the window resets", () => {
+    const limiter = new RateLimiter({ quota: 1, windowSeconds: 60, policy: "default" });
+    assert.equal(limiter.hit("a", 0).allowed, true);
+    assert.equal(limiter.hit("a", 30_000).allowed, false);
+    assert.equal(limiter.hit("a", 30_000).reset, 30);
+    assert.equal(limiter.hit("a", 60_000).allowed, true);
+  });
+
+  test("OPTIONS preflight is not counted", async () => {
+    const limiter = new RateLimiter({ quota: 1, windowSeconds: 60, policy: "default" });
+    await handleApi(req("/api/v1", { method: "OPTIONS" }), env, limiter);
+    assert.equal((await handleApi(req("/api/v1"), env, limiter)).status, 200);
+  });
+
+  test("the client table is bounded", () => {
+    const limiter = new RateLimiter({ quota: 1, windowSeconds: 60, policy: "default" }, 3);
+    for (const id of ["a", "b", "c", "d"]) limiter.hit(id, 0);
+    assert.ok(limiter.windows.size <= 3);
   });
 });

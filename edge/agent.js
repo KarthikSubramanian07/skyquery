@@ -149,6 +149,7 @@ const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": API_ALLOW,
   "Access-Control-Allow-Headers": "Accept, Content-Type",
+  "Access-Control-Expose-Headers": "RateLimit, RateLimit-Policy, Retry-After, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -162,6 +163,62 @@ export function jsonResponse(request, data, status = 200, extra = {}) {
   });
   const body = request.method === "HEAD" ? null : JSON.stringify(data, null, 2) + "\n";
   return new Response(body, { status, headers });
+}
+
+/* ------------------------------------------------------------------------- */
+/* Rate limiting (draft-ietf-httpapi-ratelimit-headers)                       */
+/* ------------------------------------------------------------------------- */
+
+export const RATE_LIMIT = { quota: 600, windowSeconds: 60, policy: "default" };
+
+/**
+ * Fixed-window request counter keyed by client IP. Counts live in the memory
+ * of one edge isolate, so the limit is enforced per isolate: a fair-use guard,
+ * not a global quota. `now` is injectable for tests.
+ */
+export class RateLimiter {
+  constructor({ quota, windowSeconds, policy } = RATE_LIMIT, maxClients = 10000) {
+    Object.assign(this, { quota, windowSeconds, policy, maxClients });
+    this.windows = new Map();
+  }
+
+  hit(clientId, now = Date.now()) {
+    const windowMs = this.windowSeconds * 1000;
+    const start = Math.floor(now / windowMs) * windowMs;
+    let entry = this.windows.get(clientId);
+    if (!entry || entry.start !== start) {
+      if (this.windows.size >= this.maxClients) this.windows.clear();
+      entry = { start, count: 0 };
+      this.windows.set(clientId, entry);
+    }
+    entry.count += 1;
+    const reset = Math.max(1, Math.ceil((start + windowMs - now) / 1000));
+    const remaining = Math.max(0, this.quota - entry.count);
+    return { allowed: entry.count <= this.quota, remaining, reset };
+  }
+
+  headers({ remaining, reset }) {
+    return {
+      "RateLimit-Policy": `"${this.policy}";q=${this.quota};w=${this.windowSeconds}`,
+      RateLimit: `"${this.policy}";r=${remaining};t=${reset}`,
+      "X-RateLimit-Limit": String(this.quota),
+      "X-RateLimit-Remaining": String(remaining),
+      "X-RateLimit-Reset": String(reset),
+    };
+  }
+}
+
+const limiter = new RateLimiter();
+
+function clientIdOf(request) {
+  return request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For")?.split(",")[0].trim() || "anonymous";
+}
+
+/** Attach rate-limit headers to `response`, a Response from the API router. */
+function withHeaders(response, extra) {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(extra)) headers.set(k, v);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
 export function errorResponse(request, status, code, message, hint, extra = {}) {
@@ -182,7 +239,22 @@ async function loadJson(env, request, path) {
   return res.json();
 }
 
-export async function handleApi(request, env) {
+export async function handleApi(request, env, rateLimiter = limiter) {
+  if (request.method === "OPTIONS") return routeApi(request, env);
+  const verdict = rateLimiter.hit(clientIdOf(request));
+  const rateHeaders = rateLimiter.headers(verdict);
+  if (!verdict.allowed) {
+    return errorResponse(
+      request, 429, "rate_limited",
+      `Too many requests. The limit is ${rateLimiter.quota} per ${rateLimiter.windowSeconds} seconds per client.`,
+      `Wait ${verdict.reset} seconds (see Retry-After), then retry. Responses are cacheable for 5 minutes.`,
+      { ...rateHeaders, "Retry-After": String(verdict.reset) },
+    );
+  }
+  return withHeaders(await routeApi(request, env), rateHeaders);
+}
+
+async function routeApi(request, env) {
   try {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { ...SECURITY_HEADERS, ...CORS } });
     if (request.method !== "GET" && request.method !== "HEAD") {

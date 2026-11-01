@@ -273,12 +273,38 @@ Errors are JSON with a stable machine-readable code and a hint:
 }
 ```
 
-Codes: `not_found`, `tool_not_found`, `method_not_allowed`, `internal_error`. Responses are cacheable, CORS-enabled, and need no authentication.
+Codes: `not_found`, `tool_not_found`, `method_not_allowed`, `rate_limited`, `internal_error`. Responses are cacheable, CORS-enabled, and need no authentication.
+
+### Rate limits
+
+Each client may make 600 requests per 60 seconds. Every response reports where you stand, in the IETF `RateLimit` header format and the common `X-RateLimit-*` form:
+
+```http
+RateLimit-Policy: "default";q=600;w=60
+RateLimit: "default";r=599;t=42
+X-RateLimit-Limit: 600
+X-RateLimit-Remaining: 599
+X-RateLimit-Reset: 42
+```
+
+Over the limit, the API returns `429` with a `rate_limited` error and a `Retry-After` header giving the seconds to wait. The data changes only on release, so cache responses (they allow 5 minutes) instead of polling.
+
+## Versioning and deprecation
+
+The API version is in the path: `/api/v1`. The policy agents can rely on:
+
+- **Within v1, changes are additive only.** New endpoints, new optional fields, and new error codes may appear. Existing fields are never removed, renamed, or retyped.
+- **Breaking changes ship as a new version** (`/api/v2`), announced in the [changelog on GitHub](https://github.com/KarthikSubramanian07/skyquery/releases) and in this section.
+- **An old version keeps working for at least 6 months** after its successor ships. During that time its responses carry a `Deprecation` header (RFC 9745) with the date it was deprecated, a `Sunset` header (RFC 8594) with the date it stops answering, and a `Link: <https://skyquery-mcp.pages.dev/developers#versioning-and-deprecation>; rel="deprecation"` header pointing here.
+- **After the sunset date** the old paths return `410 Gone` with a JSON error naming the replacement.
+
+No version is deprecated today.
 
 ## Machine-readable resources
 
 - [llms.txt](https://skyquery-mcp.pages.dev/llms.txt): when and how an agent should use SkyQuery
 - [openapi.json](https://skyquery-mcp.pages.dev/openapi.json): OpenAPI 3.1 description of the metadata API
 - [/.well-known/api-catalog](https://skyquery-mcp.pages.dev/.well-known/api-catalog): RFC 9727 API catalog
+- [/.well-known/mcp.json](https://skyquery-mcp.pages.dev/.well-known/mcp.json): MCP server card (also at [/.well-known/mcp/server-card.json](https://skyquery-mcp.pages.dev/.well-known/mcp/server-card.json)) with the install command, stdio launch command, and every tool's input schema
 - Markdown versions of every page: send `Accept: text/markdown`, or append `.md` (for example [/developers.md](https://skyquery-mcp.pages.dev/developers.md))
 - [Source code and issues](https://github.com/KarthikSubramanian07/skyquery)
