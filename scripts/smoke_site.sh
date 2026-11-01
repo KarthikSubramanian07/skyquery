@@ -73,6 +73,16 @@ expect "unknown tool: JSON 404 tool_not_found" grep -q '"tool_not_found"' <<<"$B
 fetch 'application/json' /api/does-not-exist
 expect "unknown endpoint: 404 application/json" test "$STATUS" = 404 -a "${CTYPE%%;*}" = application/json
 
+fetch '*/*' /.well-known/mcp.json
+expect "mcp.json: 200 JSON server card" grep -q '"command": "skyquery-mcp"' <<<"$BODY"
+fetch '*/*' /.well-known/mcp/server-card.json
+expect "mcp/server-card.json: 200 JSON server card" grep -q '"command": "skyquery-mcp"' <<<"$BODY"
+
+RL=$(curl -sS -D - -o /dev/null "$BASE/api/v1/status" | tr -d '\r')
+expect "API: RateLimit header" grep -qi '^ratelimit: "default";r=' <<<"$RL"
+expect "API: RateLimit-Policy header" grep -qi '^ratelimit-policy: "default";q=600;w=60' <<<"$RL"
+expect "API: X-RateLimit-Remaining header" grep -qi '^x-ratelimit-remaining:' <<<"$RL"
+
 STATUS=$(curl -sS -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/tools")
 expect "POST to API: 405" test "$STATUS" = 405
 

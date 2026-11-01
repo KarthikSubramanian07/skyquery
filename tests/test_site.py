@@ -355,3 +355,55 @@ def test_install_commands_use_github_not_pypi(path: Path) -> None:
         target = command.split()[-1]
         assert target in (GIT_INSTALL, "."), f"{path.name}: {command!r} installs from PyPI"
     assert "pypi.org" not in text.lower()
+
+
+def _load_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def test_mcp_server_card_is_published_at_both_paths() -> None:
+    card_path = SITE / ".well-known" / "mcp.json"
+    assert card_path.read_text() == (SITE / ".well-known" / "mcp" / "server-card.json").read_text()
+    card = _load_json(card_path)
+    assert card["transport"] == {"type": "stdio", "command": "skyquery-mcp"}
+    assert card["packages"][0]["install"] == f"uv tool install {GIT_INSTALL}"
+    assert card["authentication"] == {"required": False}
+    catalog = _load_json(SITE / "api" / "v1" / "tools.json")
+    assert [t["name"] for t in card["tools"]] == [t["name"] for t in catalog["tools"]]
+    assert all(t["inputSchema"]["type"] == "object" for t in card["tools"])
+
+
+def test_openapi_operations_are_self_describing() -> None:
+    spec = _load_json(SITE / "openapi.json")
+    assert '"$ref"' not in json.dumps(spec["paths"]), "operations must inline their schemas"
+    for path, item in spec["paths"].items():
+        op = item["get"]
+        ok = op["responses"]["200"]
+        assert ok["content"]["application/json"]["schema"]["type"] == "object", path
+        assert {"RateLimit", "RateLimit-Policy", "X-RateLimit-Remaining"} <= set(ok["headers"])
+        limited = op["responses"]["429"]
+        assert "Retry-After" in limited["headers"], path
+    codes = spec["components"]["schemas"]["Error"]["properties"]["error"]["properties"]["code"]
+    assert "rate_limited" in codes["enum"]
+
+
+def test_rate_limit_matches_edge_code() -> None:
+    edge = (ROOT / "edge" / "agent.js").read_text(encoding="utf-8")
+    build_site = _load_build_site()
+    match = re.search(r"RATE_LIMIT = \{ quota: (\d+), windowSeconds: (\d+)", edge)
+    assert match, "RATE_LIMIT constant not found in edge/agent.js"
+    assert (int(match[1]), int(match[2])) == (
+        build_site.RATE_LIMIT_QUOTA,
+        build_site.RATE_LIMIT_WINDOW,
+    )
+
+
+def test_deprecation_policy_is_published() -> None:
+    spec = _load_json(SITE / "openapi.json")
+    policy = spec["info"]["x-deprecation-policy"]
+    assert policy.endswith("#versioning-and-deprecation")
+    for name in ("Deprecation", "Sunset"):
+        assert name in spec["info"]["description"]
+    developers = (SITE / "developers.html").read_text(encoding="utf-8")
+    assert 'id="versioning-and-deprecation"' in developers
+    assert policy in (SITE / "llms.txt").read_text(encoding="utf-8")

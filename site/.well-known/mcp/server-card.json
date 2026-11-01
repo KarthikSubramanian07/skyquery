@@ -1,0 +1,344 @@
+{
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "name": "io.github.KarthikSubramanian07/skyquery",
+  "title": "SkyQuery",
+  "description": "Local MCP server for real astronomy data: SIMBAD, JPL Horizons, JPL SBDB, VizieR, Gaia DR3, NASA ADS, arXiv, MAST, and NASA APOD, with units and citable provenance on every result.",
+  "serverInfo": {
+    "name": "skyquery",
+    "title": "SkyQuery",
+    "version": "0.1.0"
+  },
+  "websiteUrl": "https://skyquery-mcp.pages.dev",
+  "documentationUrl": "https://skyquery-mcp.pages.dev/developers",
+  "iconUrl": "https://skyquery-mcp.pages.dev/favicon.svg",
+  "repository": {
+    "url": "https://github.com/KarthikSubramanian07/skyquery",
+    "source": "github"
+  },
+  "license": "MIT",
+  "transport": {
+    "type": "stdio",
+    "command": "skyquery-mcp"
+  },
+  "packages": [
+    {
+      "registryType": "git",
+      "identifier": "https://github.com/KarthikSubramanian07/skyquery",
+      "install": "uv tool install git+https://github.com/KarthikSubramanian07/skyquery",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeHint": "skyquery-mcp",
+      "environmentVariables": [
+        {
+          "name": "SKYQUERY_REPLAY",
+          "description": "1 (default) serves recorded fixtures offline; 0 queries live services.",
+          "isRequired": false
+        },
+        {
+          "name": "ADS_DEV_KEY",
+          "description": "Free NASA ADS token for literature search.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "remotes": [],
+  "authentication": {
+    "required": false
+  },
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    }
+  },
+  "tools": [
+    {
+      "name": "apophis_demo",
+      "description": "The headline demo: asteroid Apophis size, its 2029 close approach, a paper.",
+      "inputSchema": {
+        "properties": {
+          "with_paper": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "astronomy_picture_of_the_day",
+      "description": "Fetch NASA's Astronomy Picture of the Day (APOD) for a date, or today.",
+      "inputSchema": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "cone_search",
+      "description": "Return catalog sources within a radius of a position.",
+      "inputSchema": {
+        "properties": {
+          "center": {
+            "type": "string"
+          },
+          "radius_deg": {
+            "default": 0.05,
+            "exclusiveMinimum": 0,
+            "maximum": 5.0,
+            "type": "number"
+          },
+          "catalog": {
+            "default": "gaia",
+            "type": "string"
+          },
+          "row_limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "center"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "convert_frame",
+      "description": "Transform coordinates between reference frames (ICRS, FK5, FK4, Galactic).",
+      "inputSchema": {
+        "properties": {
+          "ra_deg": {
+            "type": "number"
+          },
+          "dec_deg": {
+            "type": "number"
+          },
+          "from_frame": {
+            "default": "icrs",
+            "enum": [
+              "icrs",
+              "fk5",
+              "fk4",
+              "galactic"
+            ],
+            "type": "string"
+          },
+          "to_frame": {
+            "default": "galactic",
+            "enum": [
+              "icrs",
+              "fk5",
+              "fk4",
+              "galactic"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ra_deg",
+          "dec_deg"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "convert_units",
+      "description": "Convert a value between physical units with astropy's tested conversions.",
+      "inputSchema": {
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "from_unit": {
+            "type": "string"
+          },
+          "to_unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "from_unit",
+          "to_unit"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "crossmatch",
+      "description": "Match a list of target names to their nearest source in a catalog.",
+      "inputSchema": {
+        "properties": {
+          "targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "catalog": {
+            "default": "gaia",
+            "type": "string"
+          },
+          "tolerance_arcsec": {
+            "default": 5.0,
+            "exclusiveMinimum": 0,
+            "maximum": 60.0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "targets"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "distance_from_parallax",
+      "description": "Convert a parallax in milliarcseconds to a distance in parsecs.",
+      "inputSchema": {
+        "properties": {
+          "parallax_mas": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "parallax_mas"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_ephemeris",
+      "description": "Compute a solar-system body's apparent ephemeris from JPL Horizons.",
+      "inputSchema": {
+        "properties": {
+          "target": {
+            "type": "string"
+          },
+          "start": {
+            "description": "UT start date, YYYY-MM-DD or YYYY-MM-DD HH:MM",
+            "type": "string"
+          },
+          "stop": {
+            "description": "UT stop date, YYYY-MM-DD or YYYY-MM-DD HH:MM",
+            "type": "string"
+          },
+          "step": {
+            "default": "1h",
+            "description": "Sampling step such as 1h, 30m, or 1d",
+            "type": "string"
+          },
+          "observer_location": {
+            "default": "500@399",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target",
+          "start",
+          "stop"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_small_body",
+      "description": "Look up an asteroid or comet's physical and orbital parameters (JPL SBDB).",
+      "inputSchema": {
+        "properties": {
+          "designation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "designation"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "object_dossier",
+      "description": "Resolve an object and, optionally, attach recent papers about it.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "with_papers": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "resolve_object",
+      "description": "Resolve an astronomical object name or identifier to normalized data.",
+      "inputSchema": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "search_literature",
+      "description": "Search the astronomy literature (NASA ADS, or arXiv when no ADS key is set).",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "rows": {
+            "default": 5,
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "prefer": {
+            "default": "ads",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "session_citations",
+      "description": "Return the deduplicated acknowledgments for every source used this session.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      }
+    }
+  ]
+}
