@@ -106,15 +106,20 @@
 <body>
   <canvas id="sky" aria-hidden="true"></canvas>
 
-  <a class="skip" href="#install">Skip to install</a>
+  <a class="skip" href="#main">Skip to content</a>
+  <div id="a11y-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
-      <a class="brand" href="#top" aria-label="SkyQuery home">
+      <a class="brand" href="#main" aria-label="SkyQuery home">
         <span class="brand__mark" aria-hidden="true">✦</span>
         <span class="brand__name">SkyQuery</span>
       </a>
-      <nav class="nav__links" aria-label="Primary">
+      <button id="nav-toggle" class="icon-btn nav__menu" type="button"
+        aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span aria-hidden="true">☰</span>
+      </button>
+      <nav class="nav__links" id="primary-nav" aria-label="Primary">
         <a href="#how">How it works</a>
         <a href="#capabilities">Capabilities</a>
         <a href="#sources">Sources</a>
@@ -122,18 +127,23 @@
         <a href="#install">Install</a>
       </nav>
       <div class="nav__actions">
-        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+        <button id="motion" class="icon-btn" type="button" aria-pressed="false"
+          aria-label="Pause background motion" title="Pause background motion">
+          <span aria-hidden="true">⏸</span>
+        </button>
+        <button id="theme" class="icon-btn" type="button" aria-pressed="false"
+          aria-label="Switch to light theme" title="Toggle theme">
           <span class="theme-sun" aria-hidden="true">☀</span>
           <span class="theme-moon" aria-hidden="true">☾</span>
         </button>
         <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
-          <span aria-hidden="true">★</span> GitHub
+          <span aria-hidden="true">★</span> GitHub <span class="sr-only">(opens in a new tab)</span>
         </a>
       </div>
     </div>
   </header>
 
-  <main id="top">
+  <main id="main">
     <!-- HERO -->
     <section class="hero wrap">
       <p class="eyebrow">SkyQuery · Local astronomy MCP server</p>
@@ -150,15 +160,22 @@
         </a>
       </div>
 
-      <div class="term" role="img"
-        aria-label="Demo: asking SkyQuery when asteroid Apophis makes its close approach; it returns 2029-04-13 at 0.000257 astronomical units, about 0.10 lunar distances, sourced from JPL Horizons.">
+      <figure class="term">
+        <figcaption class="sr-only">
+          Demo: asking SkyQuery when asteroid Apophis makes its close approach; it returns
+          2029-04-13 at 0.000257 astronomical units, about 0.10 lunar distances, sourced from
+          JPL Horizons.
+        </figcaption>
         <div class="term__bar" aria-hidden="true">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <em>skyquery — apophis close approach</em>
         </div>
         <pre class="term__body" aria-hidden="true"></pre>
-        <button class="term__replay" type="button" hidden>↻ Replay</button>
-      </div>
+        <div class="term__controls">
+          <button class="term__pause" type="button" hidden aria-pressed="false">Pause demo</button>
+          <button class="term__replay" type="button" hidden>↻ Replay</button>
+        </div>
+      </figure>
       <p class="hero__foot">Free forever · MIT · No account · No telemetry · Nothing leaves your machine</p>
     </section>
 
@@ -259,15 +276,15 @@
           <span role="columnheader">What</span>
           <span role="columnheader">Access</span>
         </div>
-        <div class="manifest__row" role="row"><span>SIMBAD</span><span>Object identifiers, coordinates, and metadata</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>JPL Horizons</span><span>Solar-system ephemerides and state vectors</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>JPL SBDB</span><span>Small-body physical and orbital parameters</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>Gaia · SDSS · 2MASS</span><span>Astrometry and photometry catalogs</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>VizieR</span><span>Thousands of published catalogs</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>NASA ADS</span><span>The astronomy literature</span><span class="warn">free key</span></div>
-        <div class="manifest__row" role="row"><span>arXiv</span><span>astro-ph preprints</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>MAST</span><span>HST / JWST / TESS / Kepler data products</span><span class="ok">no key</span></div>
-        <div class="manifest__row" role="row"><span>NASA Open APIs</span><span>APOD and the wonder layer</span><span class="warn">DEMO_KEY</span></div>
+        <div class="manifest__row" role="row"><span role="cell">SIMBAD</span><span role="cell">Object identifiers, coordinates, and metadata</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">JPL Horizons</span><span role="cell">Solar-system ephemerides and state vectors</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">JPL SBDB</span><span role="cell">Small-body physical and orbital parameters</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">Gaia · SDSS · 2MASS</span><span role="cell">Astrometry and photometry catalogs</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">VizieR</span><span role="cell">Thousands of published catalogs</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">NASA ADS</span><span role="cell">The astronomy literature</span><span role="cell" class="warn">free key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">arXiv</span><span role="cell">astro-ph preprints</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">MAST</span><span role="cell">HST / JWST / TESS / Kepler data products</span><span role="cell" class="ok">no key</span></div>
+        <div class="manifest__row" role="row"><span role="cell">NASA Open APIs</span><span role="cell">APOD and the wonder layer</span><span role="cell" class="warn">DEMO_KEY</span></div>
       </div>
       <p class="note">
         SkyQuery is an independent open-source client and is not affiliated with, or endorsed by,
@@ -286,20 +303,23 @@
           <div class="step__body">
             <h3>Install it</h3>
             <div class="tabs" data-tabs>
-              <div class="tabs__list" role="tablist">
-                <button role="tab" class="is-active" data-tab="uv">uv</button>
-                <button role="tab" data-tab="pipx">pipx</button>
-                <button role="tab" data-tab="src">from source</button>
+              <div class="tabs__list" role="tablist" aria-label="Install method">
+                <button role="tab" id="tab-uv" class="is-active" data-tab="uv"
+                  aria-selected="true" aria-controls="panel-uv" tabindex="0">uv</button>
+                <button role="tab" id="tab-pipx" data-tab="pipx"
+                  aria-selected="false" aria-controls="panel-pipx" tabindex="-1">pipx</button>
+                <button role="tab" id="tab-src" data-tab="src"
+                  aria-selected="false" aria-controls="panel-src" tabindex="-1">from source</button>
               </div>
-              <div class="code" data-panel="uv">
+              <div class="code" role="tabpanel" id="panel-uv" data-panel="uv" aria-labelledby="tab-uv">
                 <pre><span class="prompt">$</span> uv tool install git+https://github.com/KarthikSubramanian07/skyquery</pre>
                 <button class="copy" type="button" data-copy="uv tool install git+https://github.com/KarthikSubramanian07/skyquery" aria-label="Copy command">Copy</button>
               </div>
-              <div class="code" data-panel="pipx" hidden>
+              <div class="code" role="tabpanel" id="panel-pipx" data-panel="pipx" aria-labelledby="tab-pipx" hidden>
                 <pre><span class="prompt">$</span> pipx install git+https://github.com/KarthikSubramanian07/skyquery</pre>
                 <button class="copy" type="button" data-copy="pipx install git+https://github.com/KarthikSubramanian07/skyquery" aria-label="Copy command">Copy</button>
               </div>
-              <div class="code" data-panel="src" hidden>
+              <div class="code" role="tabpanel" id="panel-src" data-panel="src" aria-labelledby="tab-src" hidden>
                 <pre><span class="prompt">$</span> git clone https://github.com/KarthikSubramanian07/skyquery
 <span class="prompt">$</span> cd skyquery &amp;&amp; uv tool install .</pre>
                 <button class="copy" type="button" data-copy="git clone https://github.com/KarthikSubramanian07/skyquery && cd skyquery && uv tool install ." aria-label="Copy commands">Copy</button>
