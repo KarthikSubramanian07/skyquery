@@ -47,6 +47,7 @@
   <canvas id="sky" aria-hidden="true"></canvas>
 
   <a class="skip" href="#content">Skip to content</a>
+  <div id="a11y-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <header class="nav" id="nav">
     <div class="wrap nav__inner">
@@ -54,19 +55,28 @@
         <span class="brand__mark" aria-hidden="true">✦</span>
         <span class="brand__name">SkyQuery</span>
       </a>
-      <nav class="nav__links" aria-label="Primary">
+      <button id="nav-toggle" class="icon-btn nav__menu" type="button"
+        aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span aria-hidden="true">☰</span>
+      </button>
+      <nav class="nav__links" id="primary-nav" aria-label="Primary">
         <a href="/#how">How it works</a>
         <a href="/#capabilities">Capabilities</a>
         <a href="/developers">Developers</a>
         <a href="/#install">Install</a>
       </nav>
       <div class="nav__actions">
-        <button id="theme" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+        <button id="motion" class="icon-btn" type="button" aria-pressed="false"
+          aria-label="Pause background motion" title="Pause background motion">
+          <span aria-hidden="true">⏸</span>
+        </button>
+        <button id="theme" class="icon-btn" type="button" aria-pressed="false"
+          aria-label="Switch to light theme" title="Toggle theme">
           <span class="theme-sun" aria-hidden="true">☀</span>
           <span class="theme-moon" aria-hidden="true">☾</span>
         </button>
         <a class="btn btn--ghost" href="https://github.com/KarthikSubramanian07/skyquery" target="_blank" rel="noopener">
-          <span aria-hidden="true">★</span> GitHub
+          <span aria-hidden="true">★</span> GitHub <span class="sr-only">(opens in a new tab)</span>
         </a>
       </div>
     </div>
